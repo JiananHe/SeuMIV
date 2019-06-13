@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="resource">
+    <file>resource/download.svg</file>
+    <file>resource/exit.svg</file>
+  </qresource>
+</RCC>
