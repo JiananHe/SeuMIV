@@ -17,6 +17,10 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+private slots:
+	void onView2DSlot();
+	void onView3DSlot();
 };
 
 #endif // MAINWINDOW_H

@@ -532,9 +532,86 @@ border-color:white;</string>
               </sizepolicy>
              </property>
              <property name="styleSheet">
-              <string notr="true">border: 1.5px dashed rgb(255, 0, 0);
-background-color: rgb(0, 0, 0);</string>
+              <string notr="true"/>
              </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_8">
+              <property name="spacing">
+               <number>3</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QWidget" name="widget" native="true">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>1</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">border: 1.5px dashed rgb(255, 0, 0);</string>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_6">
+                 <property name="spacing">
+                  <number>1</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QWidget" name="widget_8" native="true">
+                   <property name="styleSheet">
+                    <string notr="true">border: 1px dashed rgb(0, 0, 255);</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QWidget" name="widget_9" native="true">
+                   <property name="styleSheet">
+                    <string notr="true">border: 1px dashed rgb(0, 0, 255);</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QWidget" name="widget_10" native="true">
+                   <property name="styleSheet">
+                    <string notr="true">border: 1px dashed rgb(0, 0, 255);</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QVTKWidget" name="qvtkWidget">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>2</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
           </layout>
@@ -557,7 +634,7 @@ background-color: rgb(0, 0, 0);</string>
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
-               <verstretch>2</verstretch>
+               <verstretch>1</verstretch>
               </sizepolicy>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -605,7 +682,7 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:0.5, x2:0.5, y2:-1, sto
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
-               <verstretch>4</verstretch>
+               <verstretch>1</verstretch>
               </sizepolicy>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -644,7 +721,7 @@ color: rgb(0, 0, 56)</string>
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
-               <verstretch>4</verstretch>
+               <verstretch>6</verstretch>
               </sizepolicy>
              </property>
             </widget>
@@ -654,9 +731,23 @@ color: rgb(0, 0, 56)</string>
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
-               <verstretch>3</verstretch>
+               <verstretch>1</verstretch>
               </sizepolicy>
              </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_9">
+              <item>
+               <widget class="QLabel" name="label_5">
+                <property name="styleSheet">
+                 <string notr="true">font: 75 14pt &quot;微软雅黑&quot;;
+font-weight: 700;
+color: rgb(0, 0, 56)</string>
+                </property>
+                <property name="text">
+                 <string>应用</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
            <item>
@@ -664,7 +755,7 @@ color: rgb(0, 0, 56)</string>
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
-               <verstretch>8</verstretch>
+               <verstretch>6</verstretch>
               </sizepolicy>
              </property>
             </widget>
@@ -674,7 +765,31 @@ color: rgb(0, 0, 56)</string>
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
-               <verstretch>40</verstretch>
+               <verstretch>1</verstretch>
+              </sizepolicy>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_10">
+              <item>
+               <widget class="QLabel" name="label_6">
+                <property name="styleSheet">
+                 <string notr="true">font: 75 14pt &quot;微软雅黑&quot;;
+font-weight: 700;
+color: rgb(0, 0, 56)</string>
+                </property>
+                <property name="text">
+                 <string>传递函数</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QWidget" name="widget_11" native="true">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>21</verstretch>
               </sizepolicy>
              </property>
             </widget>
@@ -692,6 +807,13 @@ color: rgb(0, 0, 56)</string>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QVTKWidget</class>
+   <extends>QWidget</extends>
+   <header>QVTKWidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="image.qrc"/>
  </resources>
