@@ -26,10 +26,12 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    RangeSlider.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    RangeSlider.h
 
 FORMS += \
         mainwindow.ui
