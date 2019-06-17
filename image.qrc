@@ -2,5 +2,7 @@
   <qresource prefix="icon">
     <file>resource/download.png</file>
     <file>resource/exit.png</file>
+    <file>resource/left.png</file>
+    <file>resource/right.png</file>
   </qresource>
 </RCC>
