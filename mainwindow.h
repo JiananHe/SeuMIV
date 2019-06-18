@@ -49,6 +49,10 @@ private slots:
 
 	void onColorTfMinRangeChange(int);
 	void onColorTfMaxRangeChange(int);
+	void onScalarTfMinRangeChange(int);
+	void onScalarTfMaxRangeChange(int);
+	void onGradientTfMinRangeChange(int);
+	void onGradientTfMaxRangeChange(int);
 };
 
 #endif // MAINWINDOW_H

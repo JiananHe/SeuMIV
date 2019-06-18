@@ -15,10 +15,6 @@ OpacityTransferFunctioin::OpacityTransferFunctioin(QWidget * widget, QString nam
 	min_key_label = tf_widgets->findChild<QLabel*>(name + "tf_x_min");
 	max_key_label = tf_widgets->findChild<QLabel*>(name + "tf_x_max");
 	tf_x_slider = tf_widgets->findChild<RangeSlider*>(name  + "tf_x_slider");
-
-	d = 11;
-	w = tf_diagram->geometry().width();
-	h = tf_diagram->geometry().height();
 }
 
 OpacityTransferFunctioin::~OpacityTransferFunctioin()
@@ -52,10 +48,10 @@ void OpacityTransferFunctioin::setBone2OpacityTf(vtkPiecewiseFunction * volumeOp
 
 	tf_bps->removeAllPoints();
 	tf_bps->insertBreakPoint(min_point, 0.0);
-	tf_bps->insertBreakPoint(143.56, 0.0);
-	tf_bps->insertBreakPoint(166.22, 0.69);
-	tf_bps->insertBreakPoint(214.39, 0.70);
-	tf_bps->insertBreakPoint(419.74, 0.83);
+	tf_bps->insertBreakPoint(143, 0.0);
+	tf_bps->insertBreakPoint(166, 0.69);
+	tf_bps->insertBreakPoint(214, 0.70);
+	tf_bps->insertBreakPoint(420, 0.83);
 	tf_bps->insertBreakPoint(max_point, 0.80);
 
 	updateVolumeOpacity(volumeOpacity);
@@ -129,8 +125,6 @@ void OpacityTransferFunctioin::updateVolumeOpacity(vtkPiecewiseFunction * volume
 	{
 		volumeOpacity->AddPoint(iter->first, iter->second, 0.5, 0);
 	}
-
-	//volumeOpacity->AddPoint(-16, 0, .49, .61);
 }
 
 void OpacityTransferFunctioin::showTfDiagram()
@@ -140,24 +134,39 @@ void OpacityTransferFunctioin::showTfDiagram()
 
 	QPainter painter(tf_diagram);
 	painter.setRenderHint(QPainter::Antialiasing, true);
+
+	d = 11;
+	w = tf_diagram->geometry().width();
+	h = tf_diagram->geometry().height();
+	double scale = 1.0 / (max_range - min_range);
+
 	map<double, double> cur_opacitytf_bps = tf_bps->getBreakPointsMap();
 	map<double, double>::iterator iter;
 
 	painter.setPen(QPen(Qt::darkGray));
 	painter.drawRect(d, d, w - 2 * d, h - 2 * d);
-	//draw opacity tf breakpoints
-	int n = cur_opacitytf_bps.size(), t = 0;
-	double prior_centre_x = .0, prior_centre_y = .0;
 
+	//绘制断点
+	int n = cur_opacitytf_bps.size(), t = 0, start_flag = 0;
+	double prior_centre_x = .0, prior_centre_y = .0;
+	map<double, double> bpInRange;
+	
 	for (iter = cur_opacitytf_bps.begin(); iter != cur_opacitytf_bps.end(); ++iter)
 	{
 		double gray_value = iter->first;
-		double ratio_x = (gray_value - min_key) / (max_key - min_key);
+		if (gray_value < min_range || gray_value > max_range)
+			continue;
+		else
+			bpInRange.insert(pair<double, double>(iter->first, iter->second));
+
+
+		double ratio_x = (gray_value - min_range) * scale;
 		double centre_x = (w - 2 * d)*ratio_x + d;
 
 		double opacity = iter->second;
 		double centre_y = opacityToY(opacity);
 
+		//断点
 		QRadialGradient radialGradiant(centre_x, centre_y, d / 2, centre_x + d / 4, centre_y + d / 4);
 		radialGradiant.setColorAt(0, Qt::white);
 		radialGradiant.setColorAt(1, Qt::darkGray);
@@ -165,18 +174,41 @@ void OpacityTransferFunctioin::showTfDiagram()
 
 		painter.drawEllipse(centre_x - d / 2, centre_y - d / 2, d, d);
 
-		if (iter != cur_opacitytf_bps.begin())
+		//连线
+		if (start_flag)
 		{
 			painter.setPen(QPen(Qt::black));
 			painter.drawLine(centre_x, centre_y, prior_centre_x, prior_centre_y);
 		}
+		start_flag = 1;
 		prior_centre_x = centre_x;
 		prior_centre_y = centre_y;
 	}
+	//插值计算min_range与max_range处的值
+	double min_range_value = opacityToY(tf_bps->interpolateValue(min_range));
+	double max_range_value = opacityToY(tf_bps->interpolateValue(max_range));
+	if (!start_flag)
+	{
+		painter.setPen(QPen(Qt::black));
+		painter.drawLine(d, min_range_value, w - d, max_range_value);
+	}
+	else
+	{
+		painter.setPen(QPen(Qt::black));
 
-	//draw a circle for current color tf bp
+		double min_range_upper_x = (w - 2 * d) * (bpInRange.begin()->first - min_range) * scale + d;
+		double min_range_upper_y = opacityToY(bpInRange.begin()->second);
+		painter.drawLine(d, min_range_value, min_range_upper_x, min_range_upper_y);
+
+
+		double max_range_lower_x = (w - 2 * d) * (bpInRange.rbegin()->first - min_range) * scale + d;
+		double max_range_lower_y = opacityToY(bpInRange.rbegin()->second);
+		painter.drawLine(w - d, max_range_value, max_range_lower_x, max_range_lower_y);
+	}
+
+	//当前断点
 	double cur_bp_gv = tf_bps->getBpKeyAt(cur_bp_idx, 0);
-	double cur_point = (cur_bp_gv - min_key) / (max_key - min_key);
+	double cur_point = (cur_bp_gv - min_range) * scale;
 	double cur_opacity = tf_bps->getBpValueAt(cur_bp_idx);
 
 	int out_cr = 1;
@@ -221,22 +253,21 @@ void OpacityTransferFunctioin::changeCurBpValue(int y)
 void OpacityTransferFunctioin::chooseOrAddBpAt(int x, int y)
 {
 	int tf_x = x - d;
-	double key_click = (tf_x / (double)(w - 2 * d)) * (max_key - min_key) + min_key;
+	double key_click = (tf_x / (double)(w - 2 * d)) * (max_range - min_range) + min_range;
 	double value_click = YToOpacity(y);
-	double key_gap = (d / (2.0 * (w - 2 * d))) * (max_key - min_key);
+	double key_gap = (d / (2.0 * (w - 2 * d))) * (max_range - min_range);
 
 	int flag = tf_bps->findElementInApprox(key_click, key_gap);
-	cout << "the flag is: " << flag << endl;
 	if (flag == -1)
 	{
-		//add a new tf bp
+		//新增断点
 		tf_bps->insertBreakPoint(key_click, value_click);
 		cur_bp_idx = tf_bps->findElementInApprox(key_click, 0.0);
 		showTfBpInfoAt(cur_bp_idx);
 	}
 	else
 	{
-		//choose an existing color tf bp
+		//选中断点
 		cur_bp_idx = flag;
 		showTfBpInfoAt(cur_bp_idx);
 	}
