@@ -27,14 +27,17 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    RangeSlider.cpp
+    RangeSlider.cpp \
+    volumenamedialog.cpp
 
 HEADERS += \
         mainwindow.h \
-    RangeSlider.h
+    RangeSlider.h \
+    volumenamedialog.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    volumenamedialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

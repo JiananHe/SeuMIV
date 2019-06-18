@@ -4,16 +4,21 @@
 #include <QMainWindow>
 #include <QDebug>
 #include <QDir>
+#include <qstringlist.h>
 #include <qmenu.h>
 #include <qaction.h>
 #include <qfiledialog.h>
 #include <qcolordialog.h>
+#include <qmessagebox.h>
 #include <iostream>
+#include <vector>
 
 #include "ui_mainwindow.h"
+#include "volumenamedialog.h"
 #include "volumeRenderProcess.h"
 #include "colorTransferFunction.h"
 #include "opacityTransferFunction.h"
+using namespace std;
 
 namespace Ui {
 class MainWindow;
@@ -35,6 +40,10 @@ private:
 	OpacityTransferFunctioin * opacityTf;
 	OpacityTransferFunctioin * gradientTf;
 
+	int cur_volume_id;
+	vector<bool> volume_flags;
+	QStringList volume_names;
+
 private slots:
 	void onView2DSlot();
 	void onView3DSlot();
@@ -53,6 +62,14 @@ private slots:
 	void onScalarTfMaxRangeChange(int);
 	void onGradientTfMinRangeChange(int);
 	void onGradientTfMaxRangeChange(int);
+
+	void onAddVolumeSlot();
+	void onDeleteVolumeSlot();
+	void onRenameVolumeSlot();
+	void onShowAllVolumesSlot();
+	void onClearAllVolumesSlot();
+	void onCurVolumeChangedSlot(int);
+	void onCurVolumeFlagSlot(bool);
 };
 
 #endif // MAINWINDOW_H

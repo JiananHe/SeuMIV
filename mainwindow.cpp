@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-using namespace std;
 
 #define TOP_BUTTON_SELECTED_STYLE QStringLiteral("color: rgb(255, 255, 255);font: 75 10pt \"微软雅黑\";")
 #define TOP_BUTTON_UNSELECTED_STYLE QStringLiteral("color: rgb(175, 175, 175);font: 75 10pt \"微软雅黑\";")
@@ -42,6 +41,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	gradientTf = new OpacityTransferFunctioin(ui->gradientOpacityWidget, "gradient");
 
 	//传递函数可视化图响应事件
+	ui->colorTfWidget->setVisible(false);
+	ui->scalarOpacityWidget->setVisible(false);
+	ui->gradientOpacityWidget->setVisible(false);
+
 	ui->colorTfBar->installEventFilter(this);
 	ui->colortf_curbp_color_label->installEventFilter(this);
 	connect(ui->colortf_left_button, SIGNAL(released()), this, SLOT(changeCurTfBpInfo()));
@@ -62,6 +65,16 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->gradienttf_right_button, SIGNAL(released()), this, SLOT(changeCurTfBpInfo()));
 	connect(ui->gradienttf_x_slider, SIGNAL(lowerValueChanged(int)), this, SLOT(onGradientTfMinRangeChange(int)));
 	connect(ui->gradienttf_x_slider, SIGNAL(upperValueChanged(int)), this, SLOT(onGradientTfMaxRangeChange(int)));*/
+
+	//增量绘制相关响应事件
+	cur_volume_id = -1;
+	connect(ui->ir_add_button, SIGNAL(released()), this, SLOT(onAddVolumeSlot()));
+	connect(ui->ir_delete_button, SIGNAL(released()), this, SLOT(onDeleteVolumeSlot()));
+	connect(ui->ir_rename_button, SIGNAL(released()), this, SLOT(onRenameVolumeSlot()));
+	connect(ui->ir_show_button, SIGNAL(released()), this, SLOT(onShowAllVolumesSlot()));
+	connect(ui->ir_clear_button, SIGNAL(released()), this, SLOT(onClearAllVolumesSlot()));
+	connect(ui->ir_comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onCurVolumeChangedSlot(int)));
+	connect(ui->ir_radioButton, SIGNAL(toggled(bool)), this, SLOT(onCurVolumeFlagSlot(bool)));
 }
 
 MainWindow::~MainWindow()
@@ -107,6 +120,11 @@ void MainWindow::onOpenDicomSlot()
 	opacityTf->setMinKey(min_gv);
 
 	//设置初始传递函数
+	ui->colorTfWidget->setVisible(true);
+	ui->scalarOpacityWidget->setVisible(true);
+	ui->gradientOpacityWidget->setVisible(true);
+	ui->ir_add_button->setEnabled(true);
+
 	colorTf->setBoneColorTf(vrProcess->getVolumeColorTf());
 	opacityTf->setBoneOpacityTf(vrProcess->getVolumeOpacityTf());
 }
@@ -134,6 +152,11 @@ void MainWindow::onOpenNifitSlot()
 	opacityTf->setMinKey(min_gv);
 
 	//设置初始传递函数
+	ui->colorTfWidget->setVisible(true);
+	ui->scalarOpacityWidget->setVisible(true);
+	ui->gradientOpacityWidget->setVisible(true);
+	ui->ir_add_button->setEnabled(true);
+
 	colorTf->setBoneColorTf(vrProcess->getVolumeColorTf());
 	opacityTf->setBoneOpacityTf(vrProcess->getVolumeOpacityTf());
 }
@@ -463,4 +486,134 @@ void MainWindow::onGradientTfMaxRangeChange(int upper)
 	ui->gradienttf_x_max->setText(QString::number(upper));
 	gradientTf->setmaxRange(upper);
 	ui->gradientOpacityTfBar->repaint();
+}
+
+//叠加体绘制图
+void MainWindow::onAddVolumeSlot()
+{
+	volumeNameDialog vnDialog;
+	vnDialog.exec();
+	
+	QString name = vnDialog.getInputName();
+	if (name.isEmpty())
+		return;
+	else if (volume_names.contains(name))
+		QMessageBox::warning(NULL, "warning", QStringLiteral("Volume名字重复"));
+	else if (volume_flags.size() >= 4)
+		QMessageBox::warning(NULL, "warning", QStringLiteral("内存不足，无法添加"));
+	else
+	{
+		ui->ir_show_button->setEnabled(true);
+		ui->ir_clear_button->setEnabled(true);
+		ui->ir_comboBox->setEnabled(true);
+		ui->ir_rename_button->setEnabled(true);
+		ui->ir_delete_button->setEnabled(true);
+
+		cur_volume_id = volume_flags.size();
+		volume_flags.push_back(false);
+
+		volume_names << name;
+		ui->ir_comboBox->clear();
+		ui->ir_comboBox->addItems(volume_names); // cur_volume_id变为0
+		cur_volume_id = volume_flags.size() - 1;
+		ui->ir_comboBox->setCurrentText(ui->ir_comboBox->itemText(cur_volume_id));
+
+		vrProcess->addVolume();
+	}
+}
+
+void MainWindow::onRenameVolumeSlot()
+{
+	volumeNameDialog vnDialog;
+	vnDialog.exec();
+
+	QString name = vnDialog.getInputName();
+	if (name.isEmpty())
+		return;
+	else if (volume_names.contains(name))
+		QMessageBox::warning(NULL, "warning", QStringLiteral("Volume名字重复"));
+	else
+	{
+		int cur_temp = cur_volume_id;
+		volume_names.removeAt(cur_volume_id);
+		volume_names.insert(cur_volume_id, name);
+		ui->ir_comboBox->clear();
+		ui->ir_comboBox->addItems(volume_names); // cur_volume_id变为0
+		cur_volume_id = cur_temp;
+		ui->ir_comboBox->setCurrentText(ui->ir_comboBox->itemText(cur_volume_id));
+	}
+}
+
+void MainWindow::onShowAllVolumesSlot()
+{
+	ui->ir_radioButton->setEnabled(true);
+	ui->ir_radioButton->setChecked(true);
+	ui->ir_add_button->setEnabled(false);
+	for (int i = 0; i < volume_flags.size(); ++i)
+		volume_flags[i] = true;
+}
+
+void MainWindow::onClearAllVolumesSlot()
+{
+	volume_flags.clear();
+	volume_names.clear();
+	ui->ir_comboBox->clear();
+	ui->ir_radioButton->setChecked(false);
+	ui->ir_show_button->setEnabled(false);
+	ui->ir_clear_button->setEnabled(false);
+	ui->ir_comboBox->setEnabled(false);
+	ui->ir_radioButton->setEnabled(false);
+	ui->ir_rename_button->setEnabled(false);
+	ui->ir_delete_button->setEnabled(false);
+}
+
+void MainWindow::onDeleteVolumeSlot()
+{
+	vector<bool>::iterator iter = volume_flags.begin();
+	int ft = cur_volume_id;
+	while (ft-- > 0)
+		++iter;
+	
+	volume_flags.erase(iter);
+	volume_names.removeAt(cur_volume_id);
+	cur_volume_id = cur_volume_id == volume_flags.size() ? cur_volume_id - 1 : cur_volume_id;
+	int cur_temp = cur_volume_id;
+
+	if (volume_flags.size())//还有Volume
+	{
+		ui->ir_radioButton->setChecked(volume_flags[cur_volume_id]);
+		ui->ir_comboBox->clear();
+		ui->ir_comboBox->addItems(volume_names);// cur_volume_id变为0
+		cur_volume_id = cur_temp;
+		ui->ir_comboBox->setCurrentText(ui->ir_comboBox->itemText(cur_volume_id));
+	}
+	else//没有Volume了
+	{
+		ui->ir_comboBox->clear();
+		ui->ir_radioButton->setChecked(false);
+		ui->ir_show_button->setEnabled(false);
+		ui->ir_clear_button->setEnabled(false);
+		ui->ir_comboBox->setEnabled(false);
+		ui->ir_radioButton->setEnabled(false);
+		ui->ir_rename_button->setEnabled(false);
+		ui->ir_delete_button->setEnabled(false);
+	}
+}
+
+void MainWindow::onCurVolumeChangedSlot(int name_id)
+{
+	if (name_id == -1)
+		return;
+
+	cur_volume_id = name_id;
+	if (volume_flags.size())
+		ui->ir_radioButton->setChecked(volume_flags[cur_volume_id]);
+	else
+		ui->ir_radioButton->setChecked(true);
+}
+
+void MainWindow::onCurVolumeFlagSlot(bool check)
+{
+	if(volume_flags.size())
+		volume_flags[cur_volume_id] = check;
 }
