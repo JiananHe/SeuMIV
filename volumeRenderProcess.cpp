@@ -17,6 +17,7 @@ VolumeRenderProcess::VolumeRenderProcess(QVTKWidget * qvtk_widget)
 
 	origin_data = vtkSmartPointer<vtkImageData>::New();
 	multi_data = vtkSmartPointer<vtkImageData>::New();
+	multi_property_temp = vtkSmartPointer<vtkVolumeProperty>::New();
 	multi_property = vtkSmartPointer<vtkVolumeProperty>::New();
 
 	property_id = 0;
@@ -34,6 +35,9 @@ void VolumeRenderProcess::dicomsVolumeRenderFlow(QString folder_path)
 	//reader
 	dicoms_reader = vtkSmartPointer<vtkDICOMImageReader>::New();
 	volume_render = vtkSmartPointer<vtkRenderer>::New();
+	volumeColor = vtkSmartPointer<vtkColorTransferFunction>::New();
+	volumeScalarOpacity = vtkSmartPointer<vtkPiecewiseFunction>::New();
+	volumeGradientOpacity = vtkSmartPointer<vtkPiecewiseFunction>::New();
 
 	dicoms_reader->SetDirectoryName(folderName_str);
 	dicoms_reader->Update();
@@ -45,6 +49,12 @@ void VolumeRenderProcess::dicomsVolumeRenderFlow(QString folder_path)
 	cout << "dimension[] :" << imageDims[0] << " " << imageDims[1] << " " << imageDims[2] << endl;
 	if (imageDims[0] == 0 || imageDims[1] == 0 || imageDims[2] == 0)
 		return;
+
+	//get range
+	double range[2];
+	origin_data->GetScalarRange(range);
+	min_gv = range[0];
+	max_gv = range[1];
 
 	//Mapper
 	vtkSmartPointer<vtkGPUVolumeRayCastMapper> RcGpuMapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
@@ -80,8 +90,11 @@ void VolumeRenderProcess::niiVolumeRenderFlow(QString file_name)
 
 	//reader
 	dicoms_reader = vtkSmartPointer<vtkDICOMImageReader>::New();
-
-	nii_reader = vtkSmartPointer<vtkNIFTIImageReader>::New();
+	nii_reader = vtkSmartPointer<vtkNIFTIImageReader>::New(); 
+	volumeColor = vtkSmartPointer<vtkColorTransferFunction>::New();
+	volumeScalarOpacity = vtkSmartPointer<vtkPiecewiseFunction>::New();
+	volumeGradientOpacity = vtkSmartPointer<vtkPiecewiseFunction>::New();
+	
 	nii_reader->SetFileName(fileName_str);
 	nii_reader->Update();
 
@@ -107,6 +120,11 @@ void VolumeRenderProcess::niiVolumeRenderFlow(QString file_name)
 	}
 	else
 		origin_data = nii_reader->GetOutput();
+
+	//get range
+	origin_data->GetScalarRange(range);
+	min_gv = range[0];
+	max_gv = range[1];
 
 	//Mapper
 	vtkSmartPointer<vtkGPUVolumeRayCastMapper> RcGpuMapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
@@ -162,7 +180,9 @@ void VolumeRenderProcess::addVolume()
 	gf->DeepCopy(volumeGradientOpacity);
 	multi_property->SetGradientOpacity(property_id, gf);
 
+	multi_property_temp->DeepCopy(multi_property);
 	property_id++;
+	cur_volume_id = property_id - 1;
 
 	int image_dims[3];
 	int nc;
@@ -178,6 +198,8 @@ void VolumeRenderProcess::showAllVolumes()
 	vtkSmartPointer<vtkGPUVolumeRayCastMapper> multi_mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
 	multi_mapper->SetInputData(multi_data);
 
+	multi_property->DeepCopy(multi_property_temp);
+
 	//other property
 	multi_property->ShadeOn();
 	multi_property->SetAmbient(0.1);
@@ -186,10 +208,11 @@ void VolumeRenderProcess::showAllVolumes()
 	multi_property->SetSpecularPower(10.0);
 	multi_property->SetInterpolationTypeToLinear();
 
-	//visual current volume tf
-	volumeColor = multi_property->GetRGBTransferFunction(property_id - 1);
-	volumeScalarOpacity = multi_property->GetScalarOpacity(property_id - 1);
-	volumeGradientOpacity = multi_property->GetGradientOpacity(property_id - 1);
+	//visual current volume tf, which is the last one
+	cur_volume_id = property_id - 1;
+	volumeColor = multi_property->GetRGBTransferFunction(cur_volume_id);
+	volumeScalarOpacity = multi_property->GetScalarOpacity(cur_volume_id);
+	volumeGradientOpacity = multi_property->GetGradientOpacity(cur_volume_id);
 
 	//volume
 	volume->RemoveAllObservers();
@@ -205,7 +228,32 @@ void VolumeRenderProcess::showAllVolumes()
 
 void VolumeRenderProcess::clearVolumesCache()
 {
+}
 
+void VolumeRenderProcess::changeCurVolume(int cur_vid)
+{
+	//visual current volume tf
+	cur_volume_id = cur_vid;
+	volumeColor = multi_property->GetRGBTransferFunction(cur_vid);
+	volumeScalarOpacity = multi_property->GetScalarOpacity(cur_vid);
+	volumeGradientOpacity = multi_property->GetGradientOpacity(cur_vid);
+}
+
+void VolumeRenderProcess::showCurVolume(int cur_vid)
+{
+	multi_property->SetScalarOpacity(cur_vid, multi_property_temp->GetScalarOpacity(cur_vid));
+	volumeScalarOpacity = multi_property->GetScalarOpacity(cur_vid);
+}
+
+void VolumeRenderProcess::hideCurVolume(int cur_vid)
+{
+	volumeScalarOpacity->RemoveAllObservers();
+	volumeScalarOpacity->AddPoint(min_gv, .0);
+	volumeScalarOpacity->AddPoint(max_gv, .0);
+}
+
+void VolumeRenderProcess::deleteCurVolume(int cur_vid)
+{
 }
 
 void VolumeRenderProcess::setBgColor(QColor color)
@@ -239,18 +287,12 @@ vtkImageData * VolumeRenderProcess::getOriginData()
 
 double VolumeRenderProcess::getMinGrayValue()
 {
-	double range[2];
-	origin_data->GetScalarRange(range);
-	
-	return range[0];
+	return min_gv;
 }
 
 double VolumeRenderProcess::getMaxGrayValue()
 {
-	double range[2];
-	origin_data->GetScalarRange(range);
-
-	return range[1];
+	return max_gv;
 }
 
 void VolumeRenderProcess::setVRMapper(const char * str_mapper)
@@ -281,6 +323,14 @@ void VolumeRenderProcess::setVRMapper(const char * str_mapper)
 
 void VolumeRenderProcess::update()
 {
+	//备份传递函数，忽略不可视传递函数
+	if (property_id > 1)
+	{
+		vtkSmartPointer<vtkPiecewiseFunction> cur_volume_opacitytf = multi_property->GetScalarOpacity(cur_volume_id);
+		if (cur_volume_opacitytf->GetSize() != 2 || cur_volume_opacitytf->GetValue(min_gv) != .0 || cur_volume_opacitytf->GetValue(max_gv) != .0)
+			multi_property_temp->SetScalarOpacity(cur_volume_id, cur_volume_opacitytf);
+	}
+
 	volume_render->ResetCamera();
 	my_vr_widget->GetRenderWindow()->AddRenderer(volume_render);
 	my_vr_widget->GetRenderWindow()->Render();

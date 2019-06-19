@@ -19,7 +19,8 @@ public:
 	void setSkinColorTf(vtkColorTransferFunction *);
 	void setMuscleColorTf(vtkColorTransferFunction *);
 
-	void updateVolumeColor(vtkColorTransferFunction *);
+	void updateVolumeColor(vtkColorTransferFunction *);//根据bp修改tf
+	void updateVisualColor(vtkColorTransferFunction *);//根据tf修改bp
 
 	void showTfDiagram();
 	void showCurBpValue();

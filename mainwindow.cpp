@@ -68,6 +68,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	//增量绘制相关响应事件
 	cur_volume_id = -1;
+	multi_render_flag = false;
 	connect(ui->ir_add_button, SIGNAL(released()), this, SLOT(onAddVolumeSlot()));
 	connect(ui->ir_delete_button, SIGNAL(released()), this, SLOT(onDeleteVolumeSlot()));
 	connect(ui->ir_rename_button, SIGNAL(released()), this, SLOT(onRenameVolumeSlot()));
@@ -127,6 +128,8 @@ void MainWindow::onOpenDicomSlot()
 
 	colorTf->setBoneColorTf(vrProcess->getVolumeColorTf());
 	opacityTf->setBoneOpacityTf(vrProcess->getVolumeOpacityTf());
+
+	multi_render_flag = false;
 }
 
 void MainWindow::onOpenNifitSlot()
@@ -139,6 +142,7 @@ void MainWindow::onOpenNifitSlot()
 	if (fileName.isEmpty())
 		return;
 
+	multi_render_flag = false;
 	vrProcess->niiVolumeRenderFlow(fileName);
 	vrProcess->update();
 
@@ -159,6 +163,12 @@ void MainWindow::onOpenNifitSlot()
 
 	colorTf->setBoneColorTf(vrProcess->getVolumeColorTf());
 	opacityTf->setBoneOpacityTf(vrProcess->getVolumeOpacityTf());
+
+	map<double, double> init_gradient_tf;
+	init_gradient_tf.insert(pair<double, double>(0, 1.0));
+	init_gradient_tf.insert(pair<double, double>(255, 1.0));
+	gradientTf->setCustomizedOpacityTf(vrProcess->getVolumeGradientTf(), init_gradient_tf);
+	vrProcess->update();
 }
 
 
@@ -503,14 +513,16 @@ void MainWindow::onAddVolumeSlot()
 		QMessageBox::warning(NULL, "warning", QStringLiteral("内存不足，无法添加"));
 	else
 	{
-		ui->ir_show_button->setEnabled(true);
 		ui->ir_clear_button->setEnabled(true);
-		ui->ir_comboBox->setEnabled(true);
 		ui->ir_rename_button->setEnabled(true);
 		ui->ir_delete_button->setEnabled(true);
+		ui->ir_radioButton->setChecked(true);
 
 		cur_volume_id = volume_flags.size();
-		volume_flags.push_back(false);
+		volume_flags.push_back(true);
+		if (volume_flags.size() > 1)
+			ui->ir_show_button->setEnabled(true);
+
 
 		volume_names << name;
 		ui->ir_comboBox->clear();
@@ -546,11 +558,17 @@ void MainWindow::onRenameVolumeSlot()
 
 void MainWindow::onShowAllVolumesSlot()
 {
+	vrProcess->showAllVolumes();
+
 	ui->ir_radioButton->setEnabled(true);
 	ui->ir_radioButton->setChecked(true);
+	ui->ir_comboBox->setEnabled(true);
 	ui->ir_add_button->setEnabled(false);
 	for (int i = 0; i < volume_flags.size(); ++i)
 		volume_flags[i] = true;
+	cur_volume_id = volume_flags.size() - 1;
+	ui->ir_comboBox->setCurrentText(ui->ir_comboBox->itemText(cur_volume_id));
+	multi_render_flag = true;
 }
 
 void MainWindow::onClearAllVolumesSlot()
@@ -607,13 +625,56 @@ void MainWindow::onCurVolumeChangedSlot(int name_id)
 
 	cur_volume_id = name_id;
 	if (volume_flags.size())
+	{
 		ui->ir_radioButton->setChecked(volume_flags[cur_volume_id]);
+		if (multi_render_flag)
+		{
+			//改变传递函数可视化图
+			vrProcess->changeCurVolume(name_id);
+			colorTf->updateVisualColor(vrProcess->getVolumeColorTf());
+			opacityTf->updateVisualOpacity(vrProcess->getVolumeOpacityTf());
+			gradientTf->updateVisualOpacity(vrProcess->getVolumeGradientTf());
+			//若当前Volume不可视，则传递函数可视化图不可视
+			if (!volume_flags[cur_volume_id])
+			{
+				ui->colorTfWidget->setVisible(false);
+				ui->scalarOpacityWidget->setVisible(false);
+				ui->gradientOpacityWidget->setVisible(false);
+			}
+			else
+			{
+				ui->colorTfWidget->setVisible(true);
+				ui->scalarOpacityWidget->setVisible(true);
+				ui->gradientOpacityWidget->setVisible(true);
+			}
+		}
+	}
 	else
 		ui->ir_radioButton->setChecked(true);
 }
 
 void MainWindow::onCurVolumeFlagSlot(bool check)
 {
-	if(volume_flags.size())
+	if (volume_flags.size() != 0 && volume_flags[cur_volume_id] != check)
+	{
 		volume_flags[cur_volume_id] = check;
+		if (check)
+		{
+			vrProcess->showCurVolume(cur_volume_id);
+			vrProcess->update();
+
+			ui->colorTfWidget->setVisible(true);
+			ui->scalarOpacityWidget->setVisible(true);
+			ui->gradientOpacityWidget->setVisible(true);
+		}
+		else
+		{
+			vrProcess->hideCurVolume(cur_volume_id);
+			vrProcess->update();
+
+			ui->colorTfWidget->setVisible(false);
+			ui->scalarOpacityWidget->setVisible(false);
+			ui->gradientOpacityWidget->setVisible(false);
+		}
+	}
 }

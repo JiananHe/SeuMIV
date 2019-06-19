@@ -43,6 +43,7 @@ private:
 	int cur_volume_id;
 	vector<bool> volume_flags;
 	QStringList volume_names;
+	bool multi_render_flag;
 
 private slots:
 	void onView2DSlot();

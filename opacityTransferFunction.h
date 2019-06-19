@@ -20,9 +20,8 @@ public:
 	void setMuscleOpacityTf(vtkPiecewiseFunction *);
 
 	void setCustomizedOpacityTf(vtkPiecewiseFunction *, map<double, double>);
-	void updateVolumeOpacity(vtkPiecewiseFunction *);
-
-
+	void updateVisualOpacity(vtkPiecewiseFunction *);//根据tf修改bp
+	void updateVolumeOpacity(vtkPiecewiseFunction *);//根据bp修改tf
 
 	void showTfDiagram();
 	void showCurBpValue();

@@ -112,6 +112,21 @@ void ColorTransferFunction::updateVolumeColor(vtkColorTransferFunction * volumeC
 	}
 }
 
+void ColorTransferFunction::updateVisualColor(vtkColorTransferFunction * volumeColor)
+{
+	tf_bps->removeAllPoints();
+	int bp_num = volumeColor->GetSize();
+	double node[6];
+	for (int i = 0; i < bp_num; i++)
+	{
+		volumeColor->GetNodeValue(i, node);
+		tf_bps->insertBreakPoint(node[0], MyQColor(QColor(int(node[1] * 255 + 0.5), int(node[2] * 255 + 0.5), int(node[3] * 255 + 0.5))));
+	}
+	//show info of the first color bp 
+	cur_bp_idx = 0;
+	showTfBpInfoAt(0);
+}
+
 void ColorTransferFunction::showTfDiagram()
 {
 	if (tf_bps->getMapLength() == 0)

@@ -115,6 +115,21 @@ void OpacityTransferFunctioin::setCustomizedOpacityTf(vtkPiecewiseFunction * vol
 	showTfBpInfoAt(0);
 }
 
+void OpacityTransferFunctioin::updateVisualOpacity(vtkPiecewiseFunction * volumeOpacity)
+{
+	tf_bps->removeAllPoints();
+	int bp_num = volumeOpacity->GetSize();
+	double node[4];
+	for (int i = 0; i < bp_num; i++)
+	{
+		volumeOpacity->GetNodeValue(i, node);
+		tf_bps->insertBreakPoint(node[0], node[1]);
+	}
+	//show info of the first color bp 
+	cur_bp_idx = 0;
+	showTfBpInfoAt(0);
+}
+
 void OpacityTransferFunctioin::updateVolumeOpacity(vtkPiecewiseFunction * volumeOpacity)
 {
 	volumeOpacity->RemoveAllPoints();

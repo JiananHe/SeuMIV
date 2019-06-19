@@ -24,6 +24,8 @@
 #include <vtkImageAppendComponents.h>
 #include <queue>
 
+#include <qcolor.h>
+
 class VolumeRenderProcess : public QVTKWidget
 {
 public:
@@ -36,6 +38,11 @@ public:
 	void addVolume();
 	void showAllVolumes();
 	void clearVolumesCache();
+
+	void changeCurVolume(int);
+	void showCurVolume(int);
+	void hideCurVolume(int);
+	void deleteCurVolume(int);
 
 	void setBgColor(QColor );
 
@@ -57,6 +64,8 @@ private:
 	vtkSmartPointer< vtkNIFTIImageReader> nii_reader;
 
 	vtkSmartPointer<vtkImageData> origin_data;
+	double min_gv;
+	double max_gv;
 
 	vtkSmartPointer<vtkRenderer> volume_render;
 	vtkSmartPointer<vtkVolumeProperty> volumeProperty;
@@ -66,7 +75,9 @@ private:
 	vtkSmartPointer<vtkVolume> volume;
 
 	vtkSmartPointer<vtkImageData> multi_data;
+	vtkSmartPointer<vtkVolumeProperty> multi_property_temp;
 	vtkSmartPointer<vtkVolumeProperty> multi_property;
 
 	int property_id;
+	int cur_volume_id;
 };
