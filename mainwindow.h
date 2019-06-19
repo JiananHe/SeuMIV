@@ -3,26 +3,28 @@
 
 #include <QMainWindow>
 #include <vtkDICOMImageReader.h>
-#include <vtkNIFTIImageReader.h>
 #include <vtkImageData.h>
 #include <vtkSmartPointer.h>
 #include <QFileDialog.h>
 #include <QMessageBox>
 #include <QSignalMapper>
-#include <QDebug>
+#include <QColorDialog>
+#include <vector>
+#include <string>
 #include "View2D.h"
+#include <QDebug>
 
 namespace Ui {
-class MainWindow;
+	class MainWindow;
 }
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+	explicit MainWindow(QWidget *parent = nullptr);
+	~MainWindow();
 
 public slots:
 	void onView2DSlot();
@@ -33,13 +35,25 @@ public slots:
 	void minimize();
 	void openFile();
 	void change2DView(int state);
+	void openOriginalFile();
+	void openSegmentFile();
+	void OnChangeNiiFileVisible();
+	void OnClickNiiFilesComboBox(int index);
+	void OnInterpolationMethodChanged(int index);
+	void OnCurveFitMethodChanged(int index);
 
 private:
-    Ui::MainWindow *ui;
+	Ui::MainWindow *ui;
 
 	vtkSmartPointer<vtkImageData> data;
 
-	View2D *view2D;
+	View2D *mpr;
+	View2D *cpr;
+	View2D *blend;
+	int current2DState = 1;
+
+	vector<QString> niiFiles;
+	vector<bool> niiFilesVisbile;
 };
 
 #endif // MAINWINDOW_H

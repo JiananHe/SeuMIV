@@ -33,10 +33,6 @@ public:
 	void Execute(vtkObject *caller, unsigned long ev,
 		void *callData) override
 	{
-		if (ev == vtkCommand::MouseMoveEvent) {
-			return;
-		}
-
 		vtkSmartPointer<vtkImagePlaneWidget>  ipw = dynamic_cast<vtkImagePlaneWidget *>(caller);
 		if (ipw)
 		{
@@ -64,6 +60,20 @@ public:
 
 		if (rcw)
 		{
+			/*for (int i = 0; i < 3; i++) {
+				if (rcw == RCW[i]) {
+					int *clickPos = ren[0]->GetRenderWindow()->GetInteractor()->GetEventPosition();
+					ren[i]->SetDisplayPoint(clickPos[0], clickPos[1], 0);
+					ren[i]->DisplayToView();
+					double *pos = ren[i]->GetViewPoint();
+					for (int j = 0; j < 3; j++) {
+						if (pos[j] < -1 || pos[j] > 1) {
+							return;
+						}
+					}
+				}
+			}*/
+
 			vtkSmartPointer<vtkResliceCursorLineRepresentation> rep = dynamic_cast<
 				vtkResliceCursorLineRepresentation *>(rcw->GetRepresentation());
 			// Although the return value is not used, we keep the get calls
@@ -74,12 +84,6 @@ public:
 			{
 				vtkSmartPointer<vtkPlaneSource> ps = static_cast<vtkPlaneSource *>(
 					this->IPW[i]->GetPolyDataAlgorithm());
-				/*ps->SetOrigin(this->RCW[i]->GetResliceCursorRepresentation()->
-					GetPlaneSource()->GetOrigin());
-				ps->SetPoint1(this->RCW[i]->GetResliceCursorRepresentation()->
-					GetPlaneSource()->GetPoint1());
-				ps->SetPoint2(this->RCW[i]->GetResliceCursorRepresentation()->
-					GetPlaneSource()->GetPoint2());*/
 				ps->SetNormal(rc->GetPlane(i)->GetNormal());
 				ps->SetCenter(rc->GetPlane(i)->GetOrigin());
 
@@ -88,12 +92,12 @@ public:
 			}
 		}
 
-		this->ren[0]->GetRenderWindow()->Render();;
+		this->ren[0]->GetRenderWindow()->Render();
 	}
 
 public:
 	vtkSmartPointer<vtkImagePlaneWidget> IPW[3];
 	vtkSmartPointer<vtkResliceCursorWidget> RCW[3];
-	int dimension[3];
+	int dims[3];
 	vtkSmartPointer<vtkRenderer> ren[4];
 };

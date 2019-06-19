@@ -15,8 +15,6 @@ MainWindow::MainWindow(QWidget *parent) :
 	this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint);
 	ui->stackedWidget->setCurrentIndex(0);
 
-	view2D = new View2D(ui->viewer);
-
 	//添加隐藏的widget
 	ui->horizontalLayout_5->addWidget(ui->widget_38);
 	ui->widget_38->hide();
@@ -24,6 +22,17 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->widget_42->hide();
 	ui->horizontalLayout_19->addWidget(ui->widget_45);
 	ui->widget_45->hide();
+	ui->verticalLayout->addWidget(ui->cpr);
+	ui->cpr->hide();
+	ui->verticalLayout->addWidget(ui->blend);
+	ui->blend->hide();
+	ui->widget_19->hide();
+	ui->pushButton_32->hide();
+	ui->pushButton_33->hide();
+
+	mpr = new View2D(ui->mpr);
+	cpr = new View2D(ui->cpr);
+	blend = new View2D(ui->blend);
 
 	//页面切换响应
 	connect(ui->button2D, SIGNAL(released()), this, SLOT(onView2DSlot()));
@@ -53,6 +62,15 @@ MainWindow::MainWindow(QWidget *parent) :
 	signalMapper->setMapping(ui->button3, 3);
 
 	connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(change2DView(int)));
+
+	//读取NIFTI文件
+	connect(ui->pushButton_34, &QPushButton::released, this, &MainWindow::openOriginalFile);
+	connect(ui->pushButton_67, &QPushButton::released, this, &MainWindow::openSegmentFile);
+	connect(ui->comboBox_8, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &MainWindow::OnClickNiiFilesComboBox);
+	connect(ui->radioButton_2, &QRadioButton::clicked, this, &MainWindow::OnChangeNiiFileVisible);
+
+	connect(ui->comboBox_6, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &MainWindow::OnInterpolationMethodChanged);
+	connect(ui->comboBox_7, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &MainWindow::OnCurveFitMethodChanged);
 }
 
 void MainWindow::onView2DSlot()
@@ -71,19 +89,32 @@ void MainWindow::onView3DSlot()
 }
 
 void MainWindow::show2DMPR() {
+	if (current2DState == 1)
+		return;
+
 	ui->widget_38->hide();
 	ui->widget_42->hide();
 	ui->widget_45->hide();
-	ui->widget_19->show();
+
+	ui->widget_19->hide();
+
 	ui->widget->show();
 	ui->pushButton_2->setStyleSheet(VIEW2D_BUTTON_SELECTED_STYLE);
 	ui->pushButton_3->setStyleSheet(VIEW2D_BUTTON_UNSELECTED_STYLE);
 	ui->pushButton_4->setStyleSheet(VIEW2D_BUTTON_UNSELECTED_STYLE);
 
-	view2D->state = 1;
+	ui->mpr->show();
+	ui->blend->hide();
+	ui->cpr->hide();
+
+	current2DState = 1;
+	mpr->DisplayMPR();
 }
 
 void MainWindow::show2DCPR() {
+	if (current2DState == 2)
+		return;
+
 	ui->widget_38->hide();
 	ui->widget_19->hide();
 	ui->widget_45->hide();
@@ -93,10 +124,18 @@ void MainWindow::show2DCPR() {
 	ui->pushButton_3->setStyleSheet(VIEW2D_BUTTON_SELECTED_STYLE);
 	ui->pushButton_4->setStyleSheet(VIEW2D_BUTTON_UNSELECTED_STYLE);
 
-	view2D->state = 2;
+	ui->mpr->hide();
+	ui->blend->hide();
+	ui->cpr->show();
+
+	current2DState = 2;
+	cpr->DisplayCPR();
 }
 
 void MainWindow::show2DBlend() {
+	if (current2DState == 3)
+		return;
+
 	ui->widget->hide();
 	ui->widget_19->hide();
 	ui->widget_42->hide();
@@ -106,7 +145,12 @@ void MainWindow::show2DBlend() {
 	ui->pushButton_3->setStyleSheet(VIEW2D_BUTTON_UNSELECTED_STYLE);
 	ui->pushButton_4->setStyleSheet(VIEW2D_BUTTON_SELECTED_STYLE);
 
-	view2D->state = 3;
+	ui->mpr->hide();
+	ui->cpr->hide();
+	ui->blend->show();
+
+	current2DState = 3;
+	blend->DisplayBlend();
 }
 
 void MainWindow::minimize()
@@ -134,7 +178,20 @@ void MainWindow::openFile()
 			reader->SetFileName(path.toLocal8Bit());
 			reader->Update();
 
+			//data = reader->GetOutput();
+		}
+		else if (path.endsWith(".dcm")) {
+			vtkSmartPointer<vtkDICOMImageReader> reader = vtkSmartPointer<vtkDICOMImageReader>::New();
+			reader->SetFileName(path.toLocal8Bit());
+			reader->Update();
+
 			data = reader->GetOutput();
+			string text = reader->GetPatientName();
+			text = "\t" + text + "\t" + reader->GetStudyID() + "\t" + "-CT";
+			ui->info->setText(QString::fromStdString(text));
+			mpr->setDICOMData(data);
+			cpr->setDICOMData(data);
+			blend->setDICOMData(data);
 		}
 		else {
 			QMessageBox msgBox(QMessageBox::Information, QStringLiteral("警告"), QStringLiteral("不支持的文件格式"));
@@ -166,18 +223,147 @@ void MainWindow::openFile()
 			reader->Update();
 
 			data = reader->GetOutput();
-			view2D->setDICOMData(data);
+			string text = reader->GetPatientName();
+			text = "\t" + text + "\t" + reader->GetStudyID() + "\t" + "-CT";
+			ui->info->setText(QString::fromStdString(text));
+			mpr->setDICOMData(data);
+			cpr->setDICOMData(data);
+			blend->setDICOMData(data);
 		}
 	}
 
-	if (view2D->state == 1)
-		view2D->DisplayMPR();
+	if (current2DState == 1)
+		mpr->DisplayMPR();
+	else if (current2DState == 2)
+		cpr->DisplayCPR();
+	else if (current2DState == 3)
+		blend->DisplayBlend();
 }
 
 void MainWindow::change2DView(int state)
 {
-	view2D->viewState = state;
-	view2D->changeViewPort();
+	if (current2DState == 1) {
+		mpr->viewState = state;
+		mpr->changeViewPort();
+	}
+	else if (current2DState == 2) {
+		cpr->viewState = state;
+		cpr->changeViewPort();
+	}
+	else if (current2DState == 3) {
+		blend->viewState = state;
+		blend->changeViewPort();
+	}
+}
+
+void MainWindow::openOriginalFile()
+{
+	QString file = QFileDialog::getOpenFileName(NULL, QStringLiteral("打开文件"), ".");
+	qDebug() << file << endl;
+	if (file.isEmpty() || file.isNull())
+		return;
+
+	string fileName = file.toLocal8Bit();
+	file = file.toLower();
+	if ((!file.endsWith(".nii.gz") && !file.endsWith(".nii")))
+	{
+		QMessageBox msgBox(QMessageBox::Information, QStringLiteral("警告"), QStringLiteral("添加nii文件失败"));
+		msgBox.setStandardButtons(QMessageBox::Ok);
+		msgBox.setButtonText(QMessageBox::Ok, QStringLiteral("确定"));
+		msgBox.exec();
+	}
+
+	blend->DisplayOrignalFile(fileName);
+
+	niiFiles.clear();
+	niiFilesVisbile.clear();
+
+	QString name = file.mid(file.lastIndexOf('/') + 1);
+	name = name.left(name.indexOf('.'));
+	ui->radioButton_2->setCheckable(true);
+	niiFiles.push_back(name);
+	niiFilesVisbile.push_back(true);
+
+	ui->comboBox_8->addItem(name);
+	ui->comboBox_8->setCurrentText(name);
+}
+
+void MainWindow::openSegmentFile()
+{
+	if (niiFiles.empty()) {
+		QMessageBox msgBox(QMessageBox::Information, QStringLiteral("警告"), QStringLiteral("未读入原始NIFTI文件"));
+		msgBox.setStandardButtons(QMessageBox::Ok);
+		msgBox.setButtonText(QMessageBox::Ok, QStringLiteral("确定"));
+		msgBox.exec();
+		return;
+	}
+
+	QString file = QFileDialog::getOpenFileName(NULL, QStringLiteral("打开文件"), ".");
+	qDebug() << file << endl;
+	if (file.isEmpty() || file.isNull())
+		return;
+
+	string fileName = file.toLocal8Bit();
+	if ((!file.endsWith(".nii.gz") && !file.endsWith(".nii")))
+	{
+		QMessageBox msgBox(QMessageBox::Information, QStringLiteral("警告"), QStringLiteral("添加nii文件失败"));
+		msgBox.setStandardButtons(QMessageBox::Ok);
+		msgBox.setButtonText(QMessageBox::Ok, QStringLiteral("确定"));
+		msgBox.exec();
+		return;
+	}
+
+	QColor qcolor = QColorDialog::getColor(Qt::red, this, QStringLiteral("颜色对话框"), QColorDialog::ShowAlphaChannel);
+	if (!qcolor.isValid())
+		return;
+
+	int color[4] = { qcolor.red(),qcolor.green(),qcolor.blue(),qcolor.alpha() };
+
+	QString name = file.mid(file.lastIndexOf('/') + 1);
+	name = name.left(name.indexOf('.'));
+
+	for (QString qs : niiFiles) {
+		if (qs == name) {
+			int index = ui->comboBox_8->currentIndex();
+			blend->ChangeActors(index, niiFilesVisbile[index], color);
+			return;
+		}
+	}
+
+	niiFiles.push_back(name);
+	niiFilesVisbile.push_back(true);
+
+	ui->comboBox_8->addItem(name);
+	ui->comboBox_8->setCurrentText(name);
+
+	blend->DisplaySegementFile(fileName, color);
+}
+
+void MainWindow::OnChangeNiiFileVisible()
+{
+	if (ui->radioButton_2->isCheckable()) {
+		int index = ui->comboBox_8->currentIndex();
+		niiFilesVisbile[index] = !niiFilesVisbile[index];
+		ui->radioButton_2->setChecked(niiFilesVisbile[index]);
+		blend->ChangeActors(index, niiFilesVisbile[index]);
+	}
+}
+
+void MainWindow::OnClickNiiFilesComboBox(int index)
+{
+	if (index >= 0 && index < niiFiles.size()) {
+		ui->radioButton_2->setChecked(niiFilesVisbile[index]);
+	}
+}
+
+void MainWindow::OnInterpolationMethodChanged(int index)
+{
+	cpr->myStyle->interpolationMethod = InterpolationMethod(index);
+}
+
+void MainWindow::OnCurveFitMethodChanged(int index)
+{
+	cpr->myStyle->curveFitMethod = CurveFitMethod(index);
 }
 
 MainWindow::~MainWindow()
