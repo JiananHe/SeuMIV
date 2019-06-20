@@ -22,10 +22,13 @@
 #include <vtkSliderRepresentation2D.h>
 #include <vtkNIFTIImageReader.h>
 #include <vtkImageCast.h>
-#include "vtkResliceCursorCallback.h"
-#include "vtkMyStyle.h"
+#include <vtkResliceCursor.h>
+#include <vtkResliceCursorWidget.h>
 #include "vtkSliderCallBack.h"
 #include "Common.h"
+
+class vtkMyStyle;
+class vtkResliceCursorCallback;
 
 class View2D :
 	public QVTKOpenGLWidget
@@ -39,16 +42,24 @@ public:
 	void DisplayMPR();
 	void DisplayCPR();
 	void DisplayBlend();
-	void DisplaySlices();
 	void setDICOMData(vtkImageData *data);
 	void changeViewPort();
 	void DisplayOrignalFile(string file);
 	void DisplaySegementFile(string file, int color[]);
 	void ChangeActors(int index, bool isVisible, int color[] = NULL);
+	void ChangeSlice(int state, int flag);
+	void SetWindowLevel(int state, double wl0, double wl1);
+
+	void sendWLSignal(double wl[]);
+	//TODO:
+	void DisplaySlices();
 
 	vtkSmartPointer<vtkMyStyle> myStyle = vtkSmartPointer<vtkMyStyle>::New();
 protected slots:
 	void OnResized();
+
+signals:
+	void changeWindowLevel(double w10,double wl1);
 
 public:
 	int viewState = 3;//0-左下矢状面,1-右下冠状面,2-左上横断面,3-四窗口视图-三视图+立体三视图
@@ -56,11 +67,11 @@ public:
 private:
 	bool initM = false;
 	bool initC = false;
-	bool initS = false;
 	int dims[3];
 	double range[2];
 	int height;
 	int width;
+	double wl[2];
 	vtkSmartPointer<vtkTextActor> textActor[4] = { NULL };
 	vtkSmartPointer<vtkRenderer> ren[4];
 	vtkSmartPointer<vtkRenderWindowInteractor> iren;
@@ -70,6 +81,11 @@ private:
 	vtkSmartPointer<vtkImageData> NIFTIData = NULL;
 	vector<string> niiSegFiles;
 
+	// vtkImagePlaneWidget, 该类内部定义了一个vtkImageReslice对象，利用vtkResliceCursor中定义的切分平面来切分图像，在其内部通过纹理映射来绘制到一个平面上，并在用户指定的vtkRenderer进行显示。
+	vtkSmartPointer<vtkImagePlaneWidget> planeWidget[3];
+	vtkSmartPointer<vtkResliceCursor> resliceCursor;
+	vtkSmartPointer< vtkResliceCursorWidget > resliceCursorWidget[3];
+	vtkSmartPointer<vtkResliceCursorCallback> rccbk;
 
 	vtkSmartPointer<vtkSliderWidget> sliderWidget[3];
 	vtkSmartPointer<vtkSliderCallback> sliderCbk;

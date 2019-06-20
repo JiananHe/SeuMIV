@@ -702,7 +702,7 @@ background-color: rgb(127,143,169);
 border:none;</string>
                       </property>
                       <property name="text">
-                       <string>1400</string>
+                       <string/>
                       </property>
                      </widget>
                     </item>
@@ -733,7 +733,7 @@ background-color: rgb(127,143,169);
 border:none;</string>
                       </property>
                       <property name="text">
-                       <string>-400</string>
+                       <string/>
                       </property>
                      </widget>
                     </item>
@@ -741,7 +741,7 @@ border:none;</string>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButton_5">
+                  <widget class="QPushButton" name="setWL">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                      <horstretch>1</horstretch>
@@ -2240,7 +2240,7 @@ color: rgb(0,0,0);
          <item>
           <widget class="QRadioButton" name="radioButton_2">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -2256,8 +2256,11 @@ color: rgb(0,0,0);
            <property name="text">
             <string/>
            </property>
+           <property name="checkable">
+            <bool>false</bool>
+           </property>
            <property name="checked">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
           </widget>
          </item>

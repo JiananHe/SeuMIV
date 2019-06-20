@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#pragma once
 #include <QMainWindow>
 #include <vtkDICOMImageReader.h>
 #include <vtkImageData.h>
@@ -12,6 +13,7 @@
 #include <vector>
 #include <string>
 #include "View2D.h"
+#include "vtkMyStyle.h"
 #include <QDebug>
 
 namespace Ui {
@@ -41,6 +43,9 @@ public slots:
 	void OnClickNiiFilesComboBox(int index);
 	void OnInterpolationMethodChanged(int index);
 	void OnCurveFitMethodChanged(int index);
+	void OnChangeSlice(int flag);
+	void OnChangeWindowLevel(double wl0, double wl1);
+	void SetWindowLevel();
 
 private:
 	Ui::MainWindow *ui;
@@ -50,7 +55,7 @@ private:
 	View2D *mpr;
 	View2D *cpr;
 	View2D *blend;
-	int current2DState = 1;
+	int current2DState = 1;//1-mpr,2-cpr,3-blend
 
 	vector<QString> niiFiles;
 	vector<bool> niiFilesVisbile;

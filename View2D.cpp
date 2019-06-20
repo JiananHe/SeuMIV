@@ -1,4 +1,6 @@
 #include "View2D.h"
+#include "vtkResliceCursorCallback.h"
+#include "vtkMyStyle.h"
 
 View2D::View2D(QWidget* parent, Qt::WindowFlags f)
 	:QVTKOpenGLWidget(parent, f)
@@ -41,11 +43,11 @@ View2D::~View2D()
 
 void View2D::DisplayMPR()
 {
-	if (DICOMData == NULL || initM)
+	if (DICOMData == NULL)
 		return;
-
-	// vtkImagePlaneWidget, 该类内部定义了一个vtkImageReslice对象，利用vtkResliceCursor中定义的切分平面来切分图像，在其内部通过纹理映射来绘制到一个平面上，并在用户指定的vtkRenderer进行显示。
-	vtkSmartPointer<vtkImagePlaneWidget> planeWidget[3];
+	if (initM) {
+		sendWLSignal(wl);
+	}
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -56,8 +58,9 @@ void View2D::DisplayMPR()
 		sliderWidget[i]->RemoveAllObservers();
 	}
 
-	vtkSmartPointer<vtkResliceCursorCallback> rccbk = vtkSmartPointer<vtkResliceCursorCallback>::New();
+	rccbk = vtkSmartPointer<vtkResliceCursorCallback>::New();
 	DICOMData->GetDimensions(rccbk->dims);
+	rccbk->view2D = this;
 
 	for (int i = 0; i < 4; i++)
 		rccbk->ren[i] = this->ren[i];
@@ -79,17 +82,18 @@ void View2D::DisplayMPR()
 		planeWidget[i]->InteractionOn();
 	}
 
-	vtkSmartPointer<vtkResliceCursor> resliceCursor = vtkSmartPointer<vtkResliceCursor>::New();
+	resliceCursor = vtkSmartPointer<vtkResliceCursor>::New();
 	resliceCursor->SetCenter(DICOMData->GetCenter());
 	resliceCursor->SetThickMode(0);
 	resliceCursor->SetImage(DICOMData);
 
-	vtkSmartPointer< vtkResliceCursorWidget > resliceCursorWidget[3];
 	vtkSmartPointer<vtkResliceCursorLineRepresentation> resliceCursorRep[3];
 
 	double range[2];
 	DICOMData->GetScalarRange(range);
 	double viewUp[3][3] = { { 0, 0, 1 },{ 0, 0, 1 },{ 0, 1, 0 } };
+	wl[0] = 0.9 * (range[1] - range[0]);
+	wl[1] = 0.7 * range[0] + range[1] * 0.3;
 	for (int i = 0; i < 3; i++)
 	{
 		resliceCursorWidget[i] = vtkSmartPointer< vtkResliceCursorWidget >::New();
@@ -113,12 +117,14 @@ void View2D::DisplayMPR()
 		rccbk->IPW[i] = planeWidget[i];
 		rccbk->RCW[i] = resliceCursorWidget[i];
 		resliceCursorWidget[i]->AddObserver(vtkResliceCursorWidget::ResliceAxesChangedEvent, rccbk);
-		resliceCursorRep[i]->SetWindowLevel(0.9 * (range[1] - range[0]), 0.7 * range[0] + range[1] * 0.3);
-		planeWidget[i]->SetWindowLevel(0.9 * (range[1] - range[0]), 0.7 * range[0] + range[1] * 0.3);
+		resliceCursorWidget[i]->AddObserver(vtkResliceCursorWidget::WindowLevelEvent, rccbk);
+		resliceCursorRep[i]->SetWindowLevel(wl[0], wl[1]);
+		planeWidget[i]->SetWindowLevel(wl[0], wl[1]);
 		resliceCursorRep[i]->SetLookupTable(resliceCursorRep[0]->GetLookupTable());
 		planeWidget[i]->GetColorMap()->SetLookupTable(resliceCursorRep[0]->GetLookupTable());
 	}
 	//ren[1]->GetActiveCamera()->Azimuth(90);
+	sendWLSignal(wl);
 
 	ren[3]->SetActiveCamera(vtkSmartPointer<vtkCamera>::New());
 	ren[3]->GetActiveCamera()->Elevation(110);
@@ -145,13 +151,18 @@ void View2D::DisplayMPR()
 
 void View2D::DisplayCPR()
 {
-	if (DICOMData == NULL || initC)
+	if (DICOMData == NULL)
 		return;
+	if (initC) {
+		sendWLSignal(wl);
+	}
 
 	for (int i = 0; i < 4; i++)
 	{
 		ren[i]->RemoveAllViewProps();
-		sliderWidget[i]->RemoveAllObservers();
+		if (i < 3) {
+			sliderWidget[i]->RemoveAllObservers();
+		}
 	}
 
 	DICOMData->GetScalarRange(range);
@@ -176,7 +187,8 @@ void View2D::DisplayCPR()
 	}
 
 	vtkSmartPointer<vtkImageActor> imgActor[3];
-	double wl[2] = { 0.7 * (range[1] - range[0]),0.7 * range[0] + range[1] * 0.3 };
+	wl[0] = 0.7 * (range[1] - range[0]);
+	wl[1] = 0.7 * range[0] + range[1] * 0.3;
 	for (int i = 0; i < 3; i++) {
 		reslice[i]->Update();
 		imgActor[i] = vtkSmartPointer<vtkImageActor>::New();
@@ -186,6 +198,7 @@ void View2D::DisplayCPR()
 		imgActor[i]->Update();
 		ren[i]->AddActor(imgActor[i]);
 	}
+	sendWLSignal(wl);
 
 	sliderCbk = vtkSmartPointer<vtkSliderCallback>::New();
 	sliderCbk->renWin = renWin;
@@ -220,6 +233,7 @@ void View2D::DisplayCPR()
 	}
 
 	myStyle->data = this->DICOMData;
+	myStyle->view2D = this;
 	for (int i = 0; i < 4; i++) {
 		myStyle->ren[i] = this->ren[i];
 		if (i < 3)
@@ -265,7 +279,6 @@ void View2D::setDICOMData(vtkImageData * data)
 	DICOMData = data;
 	initM = false;
 	initC = false;
-	initS = false;
 }
 
 void View2D::changeViewPort()
@@ -515,6 +528,73 @@ void View2D::ChangeActors(int index, bool isVisible, int color[])
 		ren[i]->AddActor(textActor[i]);
 
 	renWin->Render();
+}
+
+void View2D::ChangeSlice(int state, int flag)
+{
+	if (DICOMData == NULL)
+		return;
+
+	if (viewState != 3) {
+		int index = 0;
+		DICOMData->GetDimensions(dims);
+		int max = dims[viewState] - 1;
+
+		if (state == 1) {
+			index = 1.0 * (resliceCursor->GetCenter()[viewState]) / (DICOMData->GetSpacing()[viewState]);
+		}
+		else
+			index = static_cast<vtkSliderRepresentation*>(sliderWidget[viewState]->GetRepresentation())->GetValue();
+		switch (flag) {
+		case 1:
+			index = index > 0 ? index - 1 : 0;
+			break;
+		case 2:
+			index = index < max ? index + 1 : max;
+			break;
+		case 3:
+			index = 0;
+			break;
+		case 4:
+			index = max;
+			break;
+		default:
+			break;
+		}
+		if (state == 1) {
+			double center[3];
+			resliceCursor->GetCenter(center);
+			center[viewState] = index * DICOMData->GetSpacing()[viewState];
+			resliceCursor->SetCenter(center);
+			resliceCursor->Update();
+			rccbk->Execute(resliceCursorWidget[viewState], vtkResliceCursorWidget::ResliceAxesChangedEvent, NULL);
+		}
+		else {
+			sliderWidget[viewState]->GetSliderRepresentation()->SetValue(index);
+			sliderCbk->Execute(sliderWidget[viewState], vtkCommand::InteractionEvent, NULL);
+		}
+	}
+}
+
+void View2D::SetWindowLevel(int state, double wl0, double wl1)
+{
+	if (state == 1) {
+		for (int i = 0; i < 3; i++) {
+			dynamic_cast<vtkResliceCursorLineRepresentation *>(resliceCursorWidget[i]->GetRepresentation())->SetWindowLevel(wl0, wl1);
+		}
+	}
+	else if (state == 2) {
+		for (int i = 0; i < 3; i++) {
+			sliderCbk->imgActor[i]->GetProperty()->SetColorWindow(wl0);
+			sliderCbk->imgActor[i]->GetProperty()->SetColorLevel(wl1);
+		}
+	}
+	renWin->Render();
+}
+
+void View2D::sendWLSignal(double wl[])
+{
+	emit changeWindowLevel(wl[0], wl[1]);
 }
 
 void View2D::OnResized()

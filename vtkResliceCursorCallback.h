@@ -20,7 +20,7 @@
 #include <vtkTextActor.h>
 #include <vtkProperty2D.h>
 #include <QDebug>
-#include <vtkPointPicker.h>
+#include "View2D.h"
 
 class vtkResliceCursorCallback : public vtkCommand
 {
@@ -33,6 +33,19 @@ public:
 	void Execute(vtkObject *caller, unsigned long ev,
 		void *callData) override
 	{
+		if (ev == vtkResliceCursorWidget::WindowLevelEvent) {
+			vtkSmartPointer<vtkResliceCursorLineRepresentation> rep =
+				dynamic_cast<vtkResliceCursorLineRepresentation *>
+				(dynamic_cast<vtkResliceCursorWidget *>(caller)->GetRepresentation());
+			double wl[2];
+			rep->GetWindowLevel(wl);
+			for (int i = 0; i < 3; i++) {
+				rep = dynamic_cast<vtkResliceCursorLineRepresentation *>(RCW[i]->GetRepresentation());
+				rep->SetWindowLevel(wl[0],wl[1]);
+			}
+			view2D->sendWLSignal(wl);
+		}
+
 		vtkSmartPointer<vtkImagePlaneWidget>  ipw = dynamic_cast<vtkImagePlaneWidget *>(caller);
 		if (ipw)
 		{
@@ -60,22 +73,9 @@ public:
 
 		if (rcw)
 		{
-			/*for (int i = 0; i < 3; i++) {
-				if (rcw == RCW[i]) {
-					int *clickPos = ren[0]->GetRenderWindow()->GetInteractor()->GetEventPosition();
-					ren[i]->SetDisplayPoint(clickPos[0], clickPos[1], 0);
-					ren[i]->DisplayToView();
-					double *pos = ren[i]->GetViewPoint();
-					for (int j = 0; j < 3; j++) {
-						if (pos[j] < -1 || pos[j] > 1) {
-							return;
-						}
-					}
-				}
-			}*/
-
 			vtkSmartPointer<vtkResliceCursorLineRepresentation> rep = dynamic_cast<
 				vtkResliceCursorLineRepresentation *>(rcw->GetRepresentation());
+
 			// Although the return value is not used, we keep the get calls
 			// in case they had side-effects
 
@@ -96,6 +96,7 @@ public:
 	}
 
 public:
+	View2D *view2D;
 	vtkSmartPointer<vtkImagePlaneWidget> IPW[3];
 	vtkSmartPointer<vtkResliceCursorWidget> RCW[3];
 	int dims[3];

@@ -30,6 +30,11 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->pushButton_32->hide();
 	ui->pushButton_33->hide();
 
+	//设置lineEdit输入限制
+	QRegExp regExp("^-?\\d{1,4}(\\.\\d)?");
+	ui->lineEdit->setValidator(new QRegExpValidator(regExp, this));
+	ui->lineEdit_2->setValidator(new QRegExpValidator(regExp, this));
+
 	mpr = new View2D(ui->mpr);
 	cpr = new View2D(ui->cpr);
 	blend = new View2D(ui->blend);
@@ -63,6 +68,20 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(change2DView(int)));
 
+	//切换切片
+	QSignalMapper *signalMapper2 = new QSignalMapper(this);
+	connect(ui->button4, SIGNAL(released()), signalMapper2, SLOT(map()));
+	connect(ui->button5, SIGNAL(released()), signalMapper2, SLOT(map()));
+	connect(ui->button6, SIGNAL(released()), signalMapper2, SLOT(map()));
+	connect(ui->button7, SIGNAL(released()), signalMapper2, SLOT(map()));
+
+	signalMapper2->setMapping(ui->button4, 3);
+	signalMapper2->setMapping(ui->button5, 1);
+	signalMapper2->setMapping(ui->button6, 2);
+	signalMapper2->setMapping(ui->button7, 4);
+
+	connect(signalMapper2, SIGNAL(mapped(int)), this, SLOT(OnChangeSlice(int)));
+
 	//读取NIFTI文件
 	connect(ui->pushButton_34, &QPushButton::released, this, &MainWindow::openOriginalFile);
 	connect(ui->pushButton_67, &QPushButton::released, this, &MainWindow::openSegmentFile);
@@ -71,6 +90,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	connect(ui->comboBox_6, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &MainWindow::OnInterpolationMethodChanged);
 	connect(ui->comboBox_7, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &MainWindow::OnCurveFitMethodChanged);
+
+	//设置、更新窗宽窗位
+	connect(cpr, &View2D::changeWindowLevel, this, &MainWindow::OnChangeWindowLevel);
+	connect(mpr, &View2D::changeWindowLevel, this, &MainWindow::OnChangeWindowLevel);
+	connect(ui->setWL, &QPushButton::released, this, &MainWindow::SetWindowLevel);
 }
 
 void MainWindow::onView2DSlot()
@@ -281,6 +305,7 @@ void MainWindow::openOriginalFile()
 	QString name = file.mid(file.lastIndexOf('/') + 1);
 	name = name.left(name.indexOf('.'));
 	ui->radioButton_2->setCheckable(true);
+	ui->radioButton_2->setChecked(true);
 	niiFiles.push_back(name);
 	niiFilesVisbile.push_back(true);
 
@@ -332,6 +357,8 @@ void MainWindow::openSegmentFile()
 
 	niiFiles.push_back(name);
 	niiFilesVisbile.push_back(true);
+	ui->radioButton_2->setChecked(true);
+	ui->radioButton_2->setCheckable(true);
 
 	ui->comboBox_8->addItem(name);
 	ui->comboBox_8->setCurrentText(name);
@@ -364,6 +391,50 @@ void MainWindow::OnInterpolationMethodChanged(int index)
 void MainWindow::OnCurveFitMethodChanged(int index)
 {
 	cpr->myStyle->curveFitMethod = CurveFitMethod(index);
+}
+
+void MainWindow::OnChangeSlice(int flag)
+{
+	switch (current2DState) {
+	case 1:
+		mpr->ChangeSlice(current2DState, flag);
+		break;
+	case 2:
+		cpr->ChangeSlice(current2DState, flag);
+		break;
+	case 3:
+		blend->ChangeSlice(current2DState, flag);
+		break;
+	default:
+		break;
+	}
+}
+
+void MainWindow::OnChangeWindowLevel(double wl0, double wl1)
+{
+	ui->lineEdit->setText(QString::number(wl0, 'f', 1));
+	ui->lineEdit_2->setText(QString::number(wl1, 'f', 1));
+}
+
+void MainWindow::SetWindowLevel()
+{
+	QString swl0 = ui->lineEdit->text(), swl1 = ui->lineEdit_2->text();
+	if (swl0.isEmpty() || swl0.isNull() || swl1.isEmpty() || swl1.isNull())
+		return;
+	double wl0 = swl0.toDouble(), wl1 = swl1.toDouble();
+	if (wl0 == 0) {
+		QMessageBox msgBox(QMessageBox::Information, QStringLiteral("警告"), QStringLiteral("窗宽不能为0"));
+		msgBox.setStandardButtons(QMessageBox::Ok);
+		msgBox.setButtonText(QMessageBox::Ok, QStringLiteral("确定"));
+		msgBox.exec();
+		return;
+	}
+	if (current2DState == 1) {
+		mpr->SetWindowLevel(current2DState, wl0, wl1);
+	}
+	else if (current2DState == 2) {
+		cpr->SetWindowLevel(current2DState, wl0, wl1);
+	}
 }
 
 MainWindow::~MainWindow()

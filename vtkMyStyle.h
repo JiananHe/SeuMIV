@@ -24,6 +24,7 @@
 #include <vtkPointData.h>
 #include <vtkAlgorithmOutput.h>
 #include <math.h>
+#include "View2D.h"
 
 #define PI 3.14159265
 
@@ -350,6 +351,8 @@ public:
 		{
 			wl[0] = 0.01;
 		}
+
+		view2D->sendWLSignal(wl);
 	}
 
 	void showLine(vtkSmartPointer<vtkAlgorithmOutput> outputPort, vtkSmartPointer<vtkPolyDataMapper> mapper,
@@ -609,6 +612,7 @@ public:
 	}
 
 public:
+	View2D *view2D;
 	vtkSmartPointer<vtkImageData> data = NULL;//原始数据
 	vtkSmartPointer<vtkRenderer> ren[4];
 	vtkSmartPointer<vtkImageActor> imgActor[4] = { 0,0,0,0 };
