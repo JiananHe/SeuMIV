@@ -46,6 +46,11 @@ public slots:
 	void OnChangeSlice(int flag);
 	void OnChangeWindowLevel(double wl0, double wl1);
 	void SetWindowLevel();
+	void OnZoomIn();
+	void OnZoomOut();
+	void OnReset();
+	void OnClockwiseRotate();
+	void OnContraRotate();
 
 private:
 	Ui::MainWindow *ui;

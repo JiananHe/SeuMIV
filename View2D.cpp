@@ -592,6 +592,55 @@ void View2D::SetWindowLevel(int state, double wl0, double wl1)
 	renWin->Render();
 }
 
+void View2D::Zoom(int state, int flag)
+{
+	if (state != 3 && DICOMData == NULL)
+		return;
+	if (state == 3 && NIFTIData == NULL)
+		return;
+	if (viewState == 3)
+		return;
+	double factor = flag == 1 ? 1.1 : 0.9;
+	ren[viewState]->GetActiveCamera()->Zoom(factor);
+	renWin->Render();
+}
+
+void View2D::Reset(int state)
+{
+	if (state == 1) {
+		initM = false;
+		DisplayMPR();
+	}
+	else if (state == 2) {
+		initC = false;
+		DisplayCPR();
+	}
+	else if (state == 3) {
+		niiSegFiles.clear();
+		for (int i = 0; i < 3; i++)
+		{
+			ren[i]->RemoveAllViewProps();
+			if (sliderWidget[i] != NULL)
+				sliderWidget[i]->RemoveAllObservers();
+		}
+		DisplayBlend();
+	}
+}
+
+void View2D::Rotate(int state, int flag)
+{
+	if (state != 3 && DICOMData == NULL)
+		return;
+	if (state == 3 && NIFTIData == NULL)
+		return;
+	if (viewState == 3)
+		return;
+	int angle = flag == 1 ? 45 : -45;
+	ren[viewState]->GetActiveCamera()->Roll(angle);
+	renWin->Render();
+}
+
+
 void View2D::sendWLSignal(double wl[])
 {
 	emit changeWindowLevel(wl[0], wl[1]);

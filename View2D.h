@@ -49,6 +49,9 @@ public:
 	void ChangeActors(int index, bool isVisible, int color[] = NULL);
 	void ChangeSlice(int state, int flag);
 	void SetWindowLevel(int state, double wl0, double wl1);
+	void Zoom(int state, int flag);//flag,1-zoom in,2-zoom out
+	void Reset(int state);//1-mpr,2-cpr,3-blend
+	void Rotate(int state, int flag);//flag,1-clockwise rotation,2-contrarotation
 
 	void sendWLSignal(double wl[]);
 	//TODO:
@@ -59,7 +62,7 @@ protected slots:
 	void OnResized();
 
 signals:
-	void changeWindowLevel(double w10,double wl1);
+	void changeWindowLevel(double w10, double wl1);
 
 public:
 	int viewState = 3;//0-左下矢状面,1-右下冠状面,2-左上横断面,3-四窗口视图-三视图+立体三视图

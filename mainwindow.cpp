@@ -95,6 +95,13 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(cpr, &View2D::changeWindowLevel, this, &MainWindow::OnChangeWindowLevel);
 	connect(mpr, &View2D::changeWindowLevel, this, &MainWindow::OnChangeWindowLevel);
 	connect(ui->setWL, &QPushButton::released, this, &MainWindow::SetWindowLevel);
+
+	//绑定工具按钮事件
+	connect(ui->pushButton_22, &QPushButton::released, this, &MainWindow::OnReset);
+	connect(ui->pushButton_24, &QPushButton::released, this, &MainWindow::OnZoomIn);
+	connect(ui->pushButton_25, &QPushButton::released, this, &MainWindow::OnZoomOut);
+	connect(ui->pushButton_26, &QPushButton::released, this, &MainWindow::OnClockwiseRotate);
+	connect(ui->pushButton_27, &QPushButton::released, this, &MainWindow::OnContraRotate);
 }
 
 void MainWindow::onView2DSlot()
@@ -299,6 +306,7 @@ void MainWindow::openOriginalFile()
 
 	blend->DisplayOrignalFile(fileName);
 
+	ui->comboBox_8->clear();
 	niiFiles.clear();
 	niiFilesVisbile.clear();
 
@@ -434,6 +442,73 @@ void MainWindow::SetWindowLevel()
 	}
 	else if (current2DState == 2) {
 		cpr->SetWindowLevel(current2DState, wl0, wl1);
+	}
+}
+
+void MainWindow::OnZoomIn()
+{
+	if (current2DState == 1) {
+		mpr->Zoom(current2DState,1);
+	}
+	else if (current2DState == 2) {
+		cpr->Zoom(current2DState, 1);
+	}
+	else if (current2DState == 3) {
+		blend->Zoom(current2DState, 1);
+	}
+}
+
+void MainWindow::OnZoomOut()
+{
+	if (current2DState == 1) {
+		mpr->Zoom(current2DState, 2);
+	}
+	else if (current2DState == 2) {
+		cpr->Zoom(current2DState, 2);
+	}
+	else if (current2DState == 3) {
+		blend->Zoom(current2DState, 2);
+	}
+}
+
+void MainWindow::OnReset()
+{
+	if (current2DState == 1) {
+		mpr->Reset(current2DState);
+	}
+	else if (current2DState == 2) {
+		cpr->Reset(current2DState);
+	}
+	else if (current2DState == 3) {
+		blend->Reset(current2DState);
+		ui->radioButton_2->setCheckable(false);
+		ui->comboBox_8->clear();
+	}
+}
+
+void MainWindow::OnClockwiseRotate()
+{
+	if (current2DState == 1) {
+		mpr->Rotate(current2DState, 1);
+	}
+	else if (current2DState == 2) {
+		cpr->Rotate(current2DState, 1);
+	}
+	else if (current2DState == 3) {
+		blend->Rotate(current2DState, 1);
+	}
+}
+
+void MainWindow::OnContraRotate()
+{
+	if (current2DState == 1) {
+		mpr->Rotate(current2DState, 2);
+	}
+	else if (current2DState == 2) {
+		cpr->Rotate(current2DState, 2);
+	}
+	else if (current2DState == 3) {
+		blend->Rotate(current2DState, 2);
 	}
 }
 
