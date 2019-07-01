@@ -22,7 +22,7 @@ View2D::View2D(QWidget* parent, Qt::WindowFlags f)
 	ren[2]->SetBackground(0, 0, 0);
 	ren[3]->SetBackground(0, 0, 0);
 
-	const char * text[4] = { "Coronal Plane","Sagittal Plane","Transverse Plane","MPR" };
+	const char * text[4] = { "Sagittal Plane","Coronal Plane","Transverse Plane","MPR" };
 	for (int i = 0; i < 4; i++)
 	{
 		textActor[i] = vtkSmartPointer<vtkTextActor>::New();
@@ -96,10 +96,10 @@ void View2D::DisplayMPR()
 	wl[1] = 0.7 * range[0] + range[1] * 0.3;
 	for (int i = 0; i < 3; i++)
 	{
-		resliceCursorWidget[i] = vtkSmartPointer< vtkResliceCursorWidget >::New();
+		resliceCursorWidget[i] = vtkSmartPointer<vtkResliceCursorWidget>::New();
 		resliceCursorWidget[i]->SetInteractor(iren);
 
-		resliceCursorRep[i] = vtkSmartPointer< vtkResliceCursorLineRepresentation >::New();
+		resliceCursorRep[i] = vtkSmartPointer<vtkResliceCursorLineRepresentation>::New();
 		resliceCursorWidget[i]->SetRepresentation(resliceCursorRep[i]);
 		resliceCursorRep[i]->GetResliceCursorActor()->GetCursorAlgorithm()->SetResliceCursor(resliceCursor);
 		resliceCursorRep[i]->GetResliceCursorActor()->GetCursorAlgorithm()->SetReslicePlaneNormal(i);
@@ -123,7 +123,6 @@ void View2D::DisplayMPR()
 		resliceCursorRep[i]->SetLookupTable(resliceCursorRep[0]->GetLookupTable());
 		planeWidget[i]->GetColorMap()->SetLookupTable(resliceCursorRep[0]->GetLookupTable());
 	}
-	//ren[1]->GetActiveCamera()->Azimuth(90);
 	sendWLSignal(wl);
 
 	ren[3]->SetActiveCamera(vtkSmartPointer<vtkCamera>::New());
@@ -142,7 +141,7 @@ void View2D::DisplayMPR()
 
 	renWin->Render();
 
-	vtkSmartPointer< vtkInteractorStyleImage > style = vtkSmartPointer< vtkInteractorStyleImage >::New();
+	vtkSmartPointer<vtkInteractorStyleImage> style = vtkSmartPointer<vtkInteractorStyleImage>::New();
 	iren->SetInteractorStyle(style);
 	iren->Initialize();
 
@@ -256,9 +255,6 @@ void View2D::DisplayCPR()
 
 void View2D::DisplayBlend()
 {
-	for (int i = 0; i < 3; i++)
-		ren[i]->AddActor(textActor[i]);
-
 	changeViewPort();
 
 	iren->Initialize();
@@ -308,6 +304,7 @@ void View2D::changeViewPort()
 	for (int i = 0; i < 4; i++)
 		textActor[i]->SetPosition(15, height);
 
+	distanceWidget->Modified();
 	renWin->Render();
 }
 
@@ -471,8 +468,12 @@ void View2D::ChangeActors(int index, bool isVisible, int color[])
 {
 	if (color == NULL) {
 		for (int i = 0; i < 3; i++) {
-			sliderCbk->actors[index][i]->SetVisibility(isVisible);
-			sliderCbk->actors[index][i]->Update();
+			for (int i = 0; i < 3; i++) {
+				if (isVisible)
+					ren[i]->AddActor(sliderCbk->actors[index][i]);
+				else
+					ren[i]->RemoveActor(sliderCbk->actors[index][i]);
+			}
 		}
 	}
 	else {
@@ -638,6 +639,44 @@ void View2D::Rotate(int state, int flag)
 	int angle = flag == 1 ? 45 : -45;
 	ren[viewState]->GetActiveCamera()->Roll(angle);
 	renWin->Render();
+}
+
+void View2D::MeasureDistance()
+{
+	if (viewState == 3)
+		return;
+
+	distanceWidget->SetInteractor(iren);
+	distanceWidget->SetRepresentation(NULL);
+	distanceWidget->CreateDefaultRepresentation();
+	static_cast<vtkDistanceRepresentation *>(distanceWidget->GetRepresentation())
+		->SetLabelFormat("%-#6.4g mm");
+	distanceWidget->SetCurrentRenderer(ren[viewState]);
+
+	// Render an image (lights and cameras are created automatically)
+	renWin->Render();
+
+	iren->Initialize();
+	renWin->Render();
+	distanceWidget->On();
+}
+
+void View2D::MeasureAngle()
+{
+	if (viewState == 3)
+		return;
+
+	angleWidget->SetRepresentation(NULL);
+
+	angleWidget->SetInteractor(iren);
+	angleWidget->CreateDefaultRepresentation();
+	angleWidget->SetCurrentRenderer(ren[viewState]);
+
+	// Render
+	renWin->Render();
+	iren->Initialize();
+	renWin->Render();
+	angleWidget->On();
 }
 
 

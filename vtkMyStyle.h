@@ -85,8 +85,8 @@ public:
 		lineSource->Modified();
 		lineSource->Update();
 
-		double red[3] = { 1,0,0 };
-		showLine(lineSource->GetOutputPort(), polyLineMapper, polyLineActor, red);
+		double white[3] = { 1,1,1 };
+		showLine(lineSource->GetOutputPort(), polyLineMapper, polyLineActor, white);
 
 		if (displayPoints->GetNumberOfPoints() < 3) {
 			RightButtonEventEnd();
@@ -95,7 +95,7 @@ public:
 
 		double distance = dims[cr] * spacing[cr];
 		int len = 1;
-		double white[3] = { 1,1,1 };
+		double red[3] = { 1,0,0 };
 		vtkSmartPointer<vtkPoints> points2;
 
 		if (curveFitMethod == Conic) {
@@ -105,7 +105,7 @@ public:
 			fitConicCurve(displayPoints, conicSource, 0);
 			conicSource->Modified();
 			conicSource->Update();
-			showLine(conicSource->GetOutputPort(), fitCurveMapper, fitCurveActor, white);
+			showLine(conicSource->GetOutputPort(), fitCurveMapper, fitCurveActor, red);
 
 			//拟合模型中的二次曲线,计算长度
 			conicSource = vtkSmartPointer<vtkLineSource>::New();
@@ -146,7 +146,7 @@ public:
 		else {
 			//计算、显示样条曲线(世界坐标系)
 			fitBSplineCurve(displayPoints, functionSource);
-			showLine(functionSource->GetOutputPort(), fitCurveMapper, fitCurveActor, white);
+			showLine(functionSource->GetOutputPort(), fitCurveMapper, fitCurveActor, red);
 
 			//计算样条曲线(model坐标系-voxel索引)
 			len = getLength(voxelPoints);
@@ -211,8 +211,8 @@ public:
 			lineSource->Modified();
 			lineSource->Update();
 
-			double red[3] = { 1,0,0 };
-			showLine(lineSource->GetOutputPort(), polyLineMapper, polyLineActor, red);
+			double white[3] = { 1,1,1 };
+			showLine(lineSource->GetOutputPort(), polyLineMapper, polyLineActor, white);
 		}
 
 		if (changeWindowLevel) {

@@ -24,6 +24,9 @@
 #include <vtkImageCast.h>
 #include <vtkResliceCursor.h>
 #include <vtkResliceCursorWidget.h>
+#include <vtkDistanceWidget.h>
+#include <vtkDistanceRepresentation.h>
+#include <vtkAngleWidget.h>
 #include "vtkSliderCallBack.h"
 #include "Common.h"
 
@@ -51,7 +54,9 @@ public:
 	void SetWindowLevel(int state, double wl0, double wl1);
 	void Zoom(int state, int flag);//flag,1-zoom in,2-zoom out
 	void Reset(int state);//1-mpr,2-cpr,3-blend
-	void Rotate(int state, int flag);//flag,1-clockwise rotation,2-contrarotation
+	void Rotate(int state, int flag);//flag,1-clockwise rotation,2-contra-rotation
+	void MeasureDistance();
+	void MeasureAngle();
 
 	void sendWLSignal(double wl[]);
 	//TODO:
@@ -66,6 +71,8 @@ signals:
 
 public:
 	int viewState = 3;//0-左下矢状面,1-右下冠状面,2-左上横断面,3-四窗口视图-三视图+立体三视图
+	vtkSmartPointer<vtkDistanceWidget> distanceWidget =	vtkSmartPointer<vtkDistanceWidget>::New();
+	vtkSmartPointer<vtkAngleWidget> angleWidget = vtkSmartPointer<vtkAngleWidget>::New();
 
 private:
 	bool initM = false;
@@ -77,13 +84,13 @@ private:
 	double wl[2];
 	vtkSmartPointer<vtkTextActor> textActor[4] = { NULL };
 	vtkSmartPointer<vtkRenderer> ren[4];
-	vtkSmartPointer<vtkRenderWindowInteractor> iren;
-	vtkSmartPointer<vtkGenericOpenGLRenderWindow> renWin = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
 
 	vtkSmartPointer<vtkImageData> DICOMData = NULL;
 	vtkSmartPointer<vtkImageData> NIFTIData = NULL;
 	vector<string> niiSegFiles;
 
+	vtkSmartPointer<vtkRenderWindowInteractor> iren;
+	vtkSmartPointer<vtkGenericOpenGLRenderWindow> renWin = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
 	// vtkImagePlaneWidget, 该类内部定义了一个vtkImageReslice对象，利用vtkResliceCursor中定义的切分平面来切分图像，在其内部通过纹理映射来绘制到一个平面上，并在用户指定的vtkRenderer进行显示。
 	vtkSmartPointer<vtkImagePlaneWidget> planeWidget[3];
 	vtkSmartPointer<vtkResliceCursor> resliceCursor;

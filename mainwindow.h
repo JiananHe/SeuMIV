@@ -51,6 +51,9 @@ public slots:
 	void OnReset();
 	void OnClockwiseRotate();
 	void OnContraRotate();
+	void OnMeasureDistance();
+	void OnMeasureAngle();
+	void OnHand();
 
 private:
 	Ui::MainWindow *ui;

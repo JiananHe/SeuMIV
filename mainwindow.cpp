@@ -27,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->verticalLayout->addWidget(ui->blend);
 	ui->blend->hide();
 	ui->widget_19->hide();
+	ui->pushButton_30->hide();
+	ui->pushButton_31->hide();
 	ui->pushButton_32->hide();
 	ui->pushButton_33->hide();
 
@@ -98,10 +100,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	//绑定工具按钮事件
 	connect(ui->pushButton_22, &QPushButton::released, this, &MainWindow::OnReset);
+	connect(ui->pushButton_23, &QPushButton::released, this, &MainWindow::OnHand);
 	connect(ui->pushButton_24, &QPushButton::released, this, &MainWindow::OnZoomIn);
 	connect(ui->pushButton_25, &QPushButton::released, this, &MainWindow::OnZoomOut);
 	connect(ui->pushButton_26, &QPushButton::released, this, &MainWindow::OnClockwiseRotate);
 	connect(ui->pushButton_27, &QPushButton::released, this, &MainWindow::OnContraRotate);
+	connect(ui->pushButton_28, &QPushButton::released, this, &MainWindow::OnMeasureDistance);
+	connect(ui->pushButton_29, &QPushButton::released, this, &MainWindow::OnMeasureAngle);
 }
 
 void MainWindow::onView2DSlot()
@@ -219,7 +224,7 @@ void MainWindow::openFile()
 			data = reader->GetOutput();
 			string text = reader->GetPatientName();
 			text = "\t" + text + "\t" + reader->GetStudyID() + "\t" + "-CT";
-			ui->info->setText(QString::fromStdString(text));
+			ui->info->setText(QString::fromLocal8Bit(text.c_str()));
 			mpr->setDICOMData(data);
 			cpr->setDICOMData(data);
 			blend->setDICOMData(data);
@@ -256,7 +261,7 @@ void MainWindow::openFile()
 			data = reader->GetOutput();
 			string text = reader->GetPatientName();
 			text = "\t" + text + "\t" + reader->GetStudyID() + "\t" + "-CT";
-			ui->info->setText(QString::fromStdString(text));
+			ui->info->setText(QString::fromLocal8Bit(text.c_str()));
 			mpr->setDICOMData(data);
 			cpr->setDICOMData(data);
 			blend->setDICOMData(data);
@@ -448,7 +453,7 @@ void MainWindow::SetWindowLevel()
 void MainWindow::OnZoomIn()
 {
 	if (current2DState == 1) {
-		mpr->Zoom(current2DState,1);
+		mpr->Zoom(current2DState, 1);
 	}
 	else if (current2DState == 2) {
 		cpr->Zoom(current2DState, 1);
@@ -509,6 +514,55 @@ void MainWindow::OnContraRotate()
 	}
 	else if (current2DState == 3) {
 		blend->Rotate(current2DState, 2);
+	}
+}
+
+void MainWindow::OnMeasureDistance()
+{
+	if (data == NULL && current2DState == 2)
+		return;
+	if (current2DState == 3 && niiFiles.empty())
+		return;
+	/*if (current2DState == 1) {
+		mpr->MeasureDistance();
+	}
+	else */if (current2DState == 2) {
+		cpr->MeasureDistance();
+	}
+	else if (current2DState == 3) {
+		blend->MeasureDistance();
+	}
+}
+
+void MainWindow::OnMeasureAngle()
+{
+	if (data == NULL && current2DState == 2)
+		return;
+	if (current2DState == 3 && niiFiles.empty())
+		return;
+	/*if (current2DState == 1) {
+		mpr->MeasureDistance();
+	}
+	else */if (current2DState == 2) {
+		cpr->MeasureAngle();
+	}
+	else if (current2DState == 3) {
+		blend->MeasureAngle();
+	}
+}
+
+void MainWindow::OnHand()
+{
+	/*if (current2DState == 1) {
+		mpr->distanceWidget->Off();
+	}
+	else */if (current2DState == 2) {
+		cpr->angleWidget->Off();
+		cpr->distanceWidget->Off();
+	}
+	else if (current2DState == 3) {
+		blend->angleWidget->Off();
+		blend->distanceWidget->Off();
 	}
 }
 

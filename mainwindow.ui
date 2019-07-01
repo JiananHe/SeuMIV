@@ -1746,7 +1746,7 @@ color: rgb(0,0,0);
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>测量</string>
+                       <string>长度测量</string>
                       </property>
                       <property name="text">
                        <string/>
@@ -1781,14 +1781,14 @@ color: rgb(0,0,0);
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>剪切</string>
+                       <string>角度测量</string>
                       </property>
                       <property name="text">
                        <string/>
                       </property>
                       <property name="icon">
                        <iconset resource="image.qrc">
-                        <normaloff>:/icon/resource/cut.png</normaloff>:/icon/resource/cut.png</iconset>
+                        <normaloff>:/icon/resource/angle.png</normaloff>:/icon/resource/angle.png</iconset>
                       </property>
                       <property name="iconSize">
                        <size>
