@@ -80,4 +80,5 @@ private:
 
 	int property_id;
 	int cur_volume_id;
+	int volumes_status[20];//±£´ævolumeµÄshow/hide×´Ì¬£¬indexÎªproperty_id
 };

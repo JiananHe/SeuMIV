@@ -14,6 +14,7 @@ public:
 	explicit OpacityTransferFunctioin(QWidget *, QString);
 	~OpacityTransferFunctioin();
 
+	void setInitialOpacityTf(vtkPiecewiseFunction *);
 	void setBoneOpacityTf(vtkPiecewiseFunction *);
 	void setBone2OpacityTf(vtkPiecewiseFunction *);
 	void setSkinOpacityTf(vtkPiecewiseFunction *);

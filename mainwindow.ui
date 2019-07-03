@@ -519,7 +519,7 @@ border-width:1px;
 border-color:white;</string>
              </property>
              <property name="text">
-              <string>    J12631827 XXX -男 -CT</string>
+              <string>          MENG GUI LAN     27549     -CT</string>
              </property>
             </widget>
            </item>
@@ -670,7 +670,7 @@ border-color:white;</string>
                           </sizepolicy>
                          </property>
                          <property name="text">
-                          <string>400</string>
+                          <string>40</string>
                          </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
@@ -773,7 +773,7 @@ border-color:white;</string>
                           </sizepolicy>
                          </property>
                          <property name="text">
-                          <string>400</string>
+                          <string>1951.00</string>
                          </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
@@ -876,7 +876,7 @@ border-color:white;</string>
                           </sizepolicy>
                          </property>
                          <property name="text">
-                          <string>1286.36</string>
+                          <string>1118.95</string>
                          </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
@@ -1000,7 +1000,7 @@ font-weight: 700;
 color: rgb(0, 0, 56)</string>
                 </property>
                 <property name="text">
-                 <string>应用</string>
+                 <string>工具</string>
                 </property>
                </widget>
               </item>
@@ -1008,32 +1008,69 @@ color: rgb(0, 0, 56)</string>
             </widget>
            </item>
            <item>
-            <widget class="QWidget" name="widget_4" native="true">
+            <widget class="QWidget" name="toolWidget" native="true">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
                <verstretch>6</verstretch>
               </sizepolicy>
              </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_21">
-              <item>
-               <widget class="QPushButton" name="pushButton_4">
+             <property name="styleSheet">
+              <string notr="true">QWidget#toolWidget{
+background-color: rgb(245, 245, 255);
+}
+QWidget#widget_4{
+background-color: rgb(245, 245, 255);
+}
+QPushButton:enabled{
+font: 9pt &quot;Times New Roman&quot;;
+font-weight: 500;
+color: rgb(255, 255, 255);
+border-radius:10px;
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0.5, x2:0.5, y2:-0.5, stop:0 rgba(46, 51, 138, 255), stop:1 rgba(255, 255, 255, 255));
+}
+QPushButton:pressed{
+background-color: qlineargradient(spread:pad, x1:0.5, y1:1.5, x2:0.5, y2:-0.7, stop:0 rgb(12, 4, 132), stop:1 rgba(255, 255, 255, 255));
+}</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout">
+              <item row="2" column="0">
+               <widget class="QPushButton" name="pushButton_9">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>36</height>
+                 </size>
+                </property>
                 <property name="text">
-                 <string>PushButton</string>
+                 <string>Rotation</string>
                 </property>
                </widget>
               </item>
-              <item>
+              <item row="1" column="2">
+               <widget class="QPushButton" name="pushButton_8">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>36</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Specular</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
                <widget class="QPushButton" name="pushButton_5">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                  <horstretch>1</horstretch>
+                  <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>100</width>
+                  <width>0</width>
                   <height>36</height>
                  </size>
                 </property>
@@ -1051,15 +1088,188 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:1.5, x2:0.5, y2:-0.7, s
 </string>
                 </property>
                 <property name="text">
-                 <string>PushButton</string>
+                 <string>BgColor</string>
                 </property>
                </widget>
               </item>
-              <item>
-               <widget class="QPushButton" name="pushButton_6">
-                <property name="text">
-                 <string>PushButton</string>
+              <item row="2" column="1">
+               <widget class="QPushButton" name="pushButton_10">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>36</height>
+                 </size>
                 </property>
+                <property name="text">
+                 <string>Front</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QPushButton" name="pushButton_6">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>36</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Shade</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QPushButton" name="pushButton_2">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>36</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Mapper</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="3">
+               <widget class="QPushButton" name="pushButton_12">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>36</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Top</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="3">
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>0.85</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QPushButton" name="pushButton_7">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>36</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Diffuse</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QPushButton" name="pushButton_4">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>36</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Style</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QPushButton" name="pushButton_3">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>36</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Ambient</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="QPushButton" name="pushButton_11">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>36</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Flank</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0" colspan="4">
+               <widget class="QWidget" name="widget_4" native="true">
+                <layout class="QHBoxLayout" name="horizontalLayout_21">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QPushButton" name="pushButton_13">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>36</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>ROI-标量</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButton_14">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>36</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>ROI-梯度</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButton_15">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>36</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>K-Means</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </widget>
               </item>
              </layout>
@@ -1408,7 +1618,7 @@ color: rgb(0, 0, 56)</string>
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
-               <verstretch>21</verstretch>
+               <verstretch>18</verstretch>
               </sizepolicy>
              </property>
              <property name="styleSheet">

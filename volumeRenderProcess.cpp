@@ -180,7 +180,6 @@ void VolumeRenderProcess::addVolume()
 	gf->DeepCopy(volumeGradientOpacity);
 	multi_property->SetGradientOpacity(property_id, gf);
 
-	multi_property_temp->DeepCopy(multi_property);
 	property_id++;
 	cur_volume_id = property_id - 1;
 
@@ -194,11 +193,13 @@ void VolumeRenderProcess::addVolume()
 void VolumeRenderProcess::showAllVolumes()
 {
 	cout << "Show all voulmes" << endl;
+	for (int i = 0; i < 20; i++)
+		volumes_status[i] = 1;
 
 	vtkSmartPointer<vtkGPUVolumeRayCastMapper> multi_mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
 	multi_mapper->SetInputData(multi_data);
 
-	multi_property->DeepCopy(multi_property_temp);
+	multi_property_temp->DeepCopy(multi_property);//备份最初的所有的volumeProperties
 
 	//other property
 	multi_property->ShadeOn();
@@ -232,6 +233,17 @@ void VolumeRenderProcess::clearVolumesCache()
 
 void VolumeRenderProcess::changeCurVolume(int cur_vid)
 {
+	//备份当前volume的property
+	if (volumes_status[cur_volume_id] == 1)
+	{
+		multi_property_temp->SetColor(cur_volume_id, multi_property->GetRGBTransferFunction(cur_volume_id));
+		multi_property_temp->SetGradientOpacity(cur_volume_id, multi_property->GetGradientOpacity(cur_volume_id));
+
+		vtkSmartPointer<vtkPiecewiseFunction> cur_tf = vtkSmartPointer<vtkPiecewiseFunction>::New();
+		cur_tf->DeepCopy(multi_property->GetScalarOpacity(cur_volume_id));
+		multi_property_temp->SetScalarOpacity(cur_volume_id, cur_tf);
+	}
+	
 	//visual current volume tf
 	cur_volume_id = cur_vid;
 	volumeColor = multi_property->GetRGBTransferFunction(cur_vid);
@@ -241,15 +253,28 @@ void VolumeRenderProcess::changeCurVolume(int cur_vid)
 
 void VolumeRenderProcess::showCurVolume(int cur_vid)
 {
-	multi_property->SetScalarOpacity(cur_vid, multi_property_temp->GetScalarOpacity(cur_vid));
+	vtkSmartPointer<vtkPiecewiseFunction> cur_tf = vtkSmartPointer<vtkPiecewiseFunction>::New();
+	cur_tf->DeepCopy(multi_property_temp->GetScalarOpacity(cur_vid));
+	multi_property->SetScalarOpacity(cur_vid, cur_tf);
+
 	volumeScalarOpacity = multi_property->GetScalarOpacity(cur_vid);
+	volumes_status[cur_vid] = 1;
 }
 
 void VolumeRenderProcess::hideCurVolume(int cur_vid)
 {
+	//备份当前volume的property
+	multi_property_temp->SetColor(cur_vid, multi_property->GetRGBTransferFunction(cur_vid));
+	multi_property_temp->SetGradientOpacity(cur_vid, multi_property->GetGradientOpacity(cur_vid));
+
+	vtkSmartPointer<vtkPiecewiseFunction> cur_tf = vtkSmartPointer<vtkPiecewiseFunction>::New();
+	cur_tf->DeepCopy(multi_property->GetScalarOpacity(cur_vid));
+	multi_property_temp->SetScalarOpacity(cur_vid, cur_tf);
+
 	volumeScalarOpacity->RemoveAllObservers();
 	volumeScalarOpacity->AddPoint(min_gv, .0);
 	volumeScalarOpacity->AddPoint(max_gv, .0);
+	volumes_status[cur_vid] = 0;
 }
 
 void VolumeRenderProcess::deleteCurVolume(int cur_vid)
@@ -323,13 +348,13 @@ void VolumeRenderProcess::setVRMapper(const char * str_mapper)
 
 void VolumeRenderProcess::update()
 {
-	//备份传递函数，忽略不可视传递函数
-	if (property_id > 1)
-	{
-		vtkSmartPointer<vtkPiecewiseFunction> cur_volume_opacitytf = multi_property->GetScalarOpacity(cur_volume_id);
-		if (cur_volume_opacitytf->GetSize() != 2 || cur_volume_opacitytf->GetValue(min_gv) != .0 || cur_volume_opacitytf->GetValue(max_gv) != .0)
-			multi_property_temp->SetScalarOpacity(cur_volume_id, cur_volume_opacitytf);
-	}
+	////备份传递函数，忽略不可视传递函数
+	//if (property_id > 1)
+	//{
+	//	vtkSmartPointer<vtkPiecewiseFunction> cur_volume_opacitytf = multi_property->GetScalarOpacity(cur_volume_id);
+	//	if (cur_volume_opacitytf->GetSize() != 2 || cur_volume_opacitytf->GetValue(min_gv) != .0 || cur_volume_opacitytf->GetValue(max_gv) != .0)
+	//		multi_property_temp->SetScalarOpacity(cur_volume_id, cur_volume_opacitytf);
+	//}
 
 	volume_render->ResetCamera();
 	my_vr_widget->GetRenderWindow()->AddRenderer(volume_render);

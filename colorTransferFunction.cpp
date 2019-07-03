@@ -21,6 +21,19 @@ ColorTransferFunction::~ColorTransferFunction()
 {
 }
 
+void ColorTransferFunction::setInitialColorTf(vtkColorTransferFunction * volumeColor)
+{
+	tf_bps->removeAllPoints();
+	tf_bps->insertBreakPoint(min_key, MyQColor(QColor(0, 0, 0)));
+	tf_bps->insertBreakPoint(max_key, MyQColor(QColor(255, 255, 255)));
+
+	updateVolumeColor(volumeColor);
+
+	//show info of the first color bp 
+	cur_bp_idx = 0;
+	showTfBpInfoAt(0);
+}
+
 void ColorTransferFunction::setBoneColorTf(vtkColorTransferFunction * volumeColor)
 {
 	//bone

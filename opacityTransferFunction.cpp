@@ -21,6 +21,19 @@ OpacityTransferFunctioin::~OpacityTransferFunctioin()
 {
 }
 
+void OpacityTransferFunctioin::setInitialOpacityTf(vtkPiecewiseFunction * volumeOpacity)
+{
+	tf_bps->removeAllPoints();
+	tf_bps->insertBreakPoint(min_key, 0.0);
+	tf_bps->insertBreakPoint(max_key, 1.0);
+
+	updateVolumeOpacity(volumeOpacity);
+
+	//show info of the first opacity bp
+	cur_bp_idx = 0;
+	showTfBpInfoAt(0);
+}
+
 void OpacityTransferFunctioin::setBoneOpacityTf(vtkPiecewiseFunction * volumeOpacity)
 {
 	//bone

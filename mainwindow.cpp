@@ -58,10 +58,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->scalartf_right_button, SIGNAL(released()), this, SLOT(changeCurTfBpInfo()));
 	connect(ui->scalartf_x_slider, SIGNAL(lowerValueChanged(int)), this, SLOT(onScalarTfMinRangeChange(int)));
 	connect(ui->scalartf_x_slider, SIGNAL(upperValueChanged(int)), this, SLOT(onScalarTfMaxRangeChange(int)));
-
-/*	ui->gradientOpacityTfBar->installEventFilter(this);
+	
+	ui->gradientOpacityTfBar->installEventFilter(this);
 	ui->gradienttf_curbp_opacity_label->installEventFilter(this);
-	connect(ui->gradienttf_left_button, SIGNAL(released()), this, SLOT(changeCurTfBpInfo()));
+	/*connect(ui->gradienttf_left_button, SIGNAL(released()), this, SLOT(changeCurTfBpInfo()));
 	connect(ui->gradienttf_right_button, SIGNAL(released()), this, SLOT(changeCurTfBpInfo()));
 	connect(ui->gradienttf_x_slider, SIGNAL(lowerValueChanged(int)), this, SLOT(onGradientTfMinRangeChange(int)));
 	connect(ui->gradienttf_x_slider, SIGNAL(upperValueChanged(int)), this, SLOT(onGradientTfMaxRangeChange(int)));*/
@@ -120,14 +120,23 @@ void MainWindow::onOpenDicomSlot()
 	opacityTf->setMaxKey(max_gv);
 	opacityTf->setMinKey(min_gv);
 
+	gradientTf->setMaxKey(1185);
+	gradientTf->setMinKey(0);
+
 	//设置初始传递函数
 	ui->colorTfWidget->setVisible(true);
 	ui->scalarOpacityWidget->setVisible(true);
 	ui->gradientOpacityWidget->setVisible(true);
 	ui->ir_add_button->setEnabled(true);
 
-	colorTf->setBoneColorTf(vrProcess->getVolumeColorTf());
-	opacityTf->setBoneOpacityTf(vrProcess->getVolumeOpacityTf());
+	colorTf->setInitialColorTf(vrProcess->getVolumeColorTf());
+	opacityTf->setInitialOpacityTf(vrProcess->getVolumeOpacityTf());
+
+	map<double, double> init_gradient_tf;
+	init_gradient_tf.insert(pair<double, double>(0, 1.0));
+	init_gradient_tf.insert(pair<double, double>(1185, 1.0));
+	gradientTf->setCustomizedOpacityTf(vrProcess->getVolumeGradientTf(), init_gradient_tf);
+	vrProcess->update();
 
 	multi_render_flag = false;
 }
@@ -161,14 +170,16 @@ void MainWindow::onOpenNifitSlot()
 	ui->gradientOpacityWidget->setVisible(true);
 	ui->ir_add_button->setEnabled(true);
 
-	colorTf->setBoneColorTf(vrProcess->getVolumeColorTf());
-	opacityTf->setBoneOpacityTf(vrProcess->getVolumeOpacityTf());
+	colorTf->setInitialColorTf(vrProcess->getVolumeColorTf());
+	opacityTf->setInitialOpacityTf(vrProcess->getVolumeOpacityTf());
 
 	map<double, double> init_gradient_tf;
 	init_gradient_tf.insert(pair<double, double>(0, 1.0));
-	init_gradient_tf.insert(pair<double, double>(255, 1.0));
+	init_gradient_tf.insert(pair<double, double>(1185, 1.0));
 	gradientTf->setCustomizedOpacityTf(vrProcess->getVolumeGradientTf(), init_gradient_tf);
 	vrProcess->update();
+
+	multi_render_flag = false;
 }
 
 
@@ -666,6 +677,7 @@ void MainWindow::onCurVolumeFlagSlot(bool check)
 			ui->colorTfWidget->setVisible(true);
 			ui->scalarOpacityWidget->setVisible(true);
 			ui->gradientOpacityWidget->setVisible(true);
+			opacityTf->updateVisualOpacity(vrProcess->getVolumeOpacityTf());
 		}
 		else
 		{

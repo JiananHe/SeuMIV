@@ -14,6 +14,7 @@ public:
 	explicit ColorTransferFunction(QWidget * );
 	~ColorTransferFunction();
 
+	void setInitialColorTf(vtkColorTransferFunction *);
 	void setBoneColorTf(vtkColorTransferFunction *);
 	void setBone2ColorTf(vtkColorTransferFunction *);
 	void setSkinColorTf(vtkColorTransferFunction *);
