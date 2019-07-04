@@ -18,6 +18,9 @@
 #include "volumeRenderProcess.h"
 #include "colorTransferFunction.h"
 #include "opacityTransferFunction.h"
+#include "dicomVisualizer.h"
+#include "roiVisualizer.h"
+#include "boundVisulizer.h"
 using namespace std;
 
 namespace Ui {
@@ -40,6 +43,10 @@ private:
 	OpacityTransferFunctioin * opacityTf;
 	OpacityTransferFunctioin * gradientTf;
 
+	DicomVisualizer * dicomVisualizer;
+	RoiVisualizer * roiVisualizer;
+	BoundVisualizer * boundVisualizer;
+
 	int cur_volume_id;
 	vector<bool> volume_flags;
 	QStringList volume_names;
@@ -52,11 +59,12 @@ private slots:
 	void onOpenDicomSlot();
 	void onOpenNifitSlot();
 
-//3D体绘制相关槽函数
+
 private slots:
 	bool eventFilter(QObject *, QEvent *);
 	void changeCurTfBpInfo();
 
+	//传递函数相关槽函数
 	void onColorTfMinRangeChange(int);
 	void onColorTfMaxRangeChange(int);
 	void onScalarTfMinRangeChange(int);
@@ -64,6 +72,7 @@ private slots:
 	void onGradientTfMinRangeChange(int);
 	void onGradientTfMaxRangeChange(int);
 
+	//3D体绘制相关槽函数
 	void onAddVolumeSlot();
 	void onDeleteVolumeSlot();
 	void onRenameVolumeSlot();
@@ -71,6 +80,14 @@ private slots:
 	void onClearAllVolumesSlot();
 	void onCurVolumeChangedSlot(int);
 	void onCurVolumeFlagSlot(bool);
+
+	//切片图相关槽函数
+	void onDicomSeriesSlideMoveSlot(int);
+	void onRoiGrayMinChangeSlot(int);
+	void onRoiGrayMaxChangeSlot(int);
+	void onRoiMagMinChangeSlot(int);
+	void onRoiMagMaxChangeSlot(int);
+
 };
 
 #endif // MAINWINDOW_H

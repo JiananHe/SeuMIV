@@ -2,7 +2,7 @@
 
 #define TOP_BUTTON_SELECTED_STYLE QStringLiteral("color: rgb(255, 255, 255);font: 75 10pt \"微软雅黑\";")
 #define TOP_BUTTON_UNSELECTED_STYLE QStringLiteral("color: rgb(175, 175, 175);font: 75 10pt \"微软雅黑\";")
-//vtkStandardNewMacro(myVtkInteractorStyleImage);
+vtkStandardNewMacro(myVtkInteractorStyleImage);
 int color_left_border = 10000, color_right_border = 0, opacity_left_border = 10000, opacity_right_border = 0, gradient_left_border = 10000, gradient_right_border = 0;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -12,6 +12,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 	this->setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
 	ui->stackedWidget->setCurrentIndex(0);
+
+	//体绘制及传递函数相关对象
+	vrProcess = new VolumeRenderProcess(ui->volumeRenderWidget);
+	colorTf = new ColorTransferFunction(ui->colorTfWidget);
+	opacityTf = new OpacityTransferFunctioin(ui->scalarOpacityWidget, "scalar");
+	gradientTf = new OpacityTransferFunctioin(ui->gradientOpacityWidget, "gradient");
+
+	//二维切片显示相关对象
+	dicomVisualizer = new DicomVisualizer(ui->dicom_frame, "dicom", ui->series_slider_frame);
+	roiVisualizer = new RoiVisualizer(ui->roi_frame, "roi", ui->series_slider_frame);
+	boundVisualizer = new BoundVisualizer(ui->bound_frame, "bound", ui->series_slider_frame);
 
 	//页面切换响应
 	connect(ui->button2D, SIGNAL(released()), this, SLOT(onView2DSlot()));
@@ -34,12 +45,6 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(openDicom, SIGNAL(triggered()), this, SLOT(onOpenDicomSlot()));
 	connect(openNifit, SIGNAL(triggered()), this, SLOT(onOpenNifitSlot()));
 
-	//体绘制相关对象
-	vrProcess = new VolumeRenderProcess(ui->volumeRenderWidget);
-	colorTf = new ColorTransferFunction(ui->colorTfWidget);
-	opacityTf = new OpacityTransferFunctioin(ui->scalarOpacityWidget, "scalar");
-	gradientTf = new OpacityTransferFunctioin(ui->gradientOpacityWidget, "gradient");
-
 	//传递函数可视化图响应事件
 	ui->colorTfWidget->setVisible(false);
 	ui->scalarOpacityWidget->setVisible(false);
@@ -61,10 +66,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	
 	ui->gradientOpacityTfBar->installEventFilter(this);
 	ui->gradienttf_curbp_opacity_label->installEventFilter(this);
-	/*connect(ui->gradienttf_left_button, SIGNAL(released()), this, SLOT(changeCurTfBpInfo()));
+	connect(ui->gradienttf_left_button, SIGNAL(released()), this, SLOT(changeCurTfBpInfo()));
 	connect(ui->gradienttf_right_button, SIGNAL(released()), this, SLOT(changeCurTfBpInfo()));
 	connect(ui->gradienttf_x_slider, SIGNAL(lowerValueChanged(int)), this, SLOT(onGradientTfMinRangeChange(int)));
-	connect(ui->gradienttf_x_slider, SIGNAL(upperValueChanged(int)), this, SLOT(onGradientTfMaxRangeChange(int)));*/
+	connect(ui->gradienttf_x_slider, SIGNAL(upperValueChanged(int)), this, SLOT(onGradientTfMaxRangeChange(int)));
 
 	//增量绘制相关响应事件
 	cur_volume_id = -1;
@@ -76,6 +81,13 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->ir_clear_button, SIGNAL(released()), this, SLOT(onClearAllVolumesSlot()));
 	connect(ui->ir_comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onCurVolumeChangedSlot(int)));
 	connect(ui->ir_radioButton, SIGNAL(toggled(bool)), this, SLOT(onCurVolumeFlagSlot(bool)));
+
+	//二维切片图相关相应事件
+	connect(ui->dicom_series_slider, SIGNAL(valueChanged(int)), this, SLOT(onDicomSeriesSlideMoveSlot(int)));
+	connect(ui->roi_range_slider, SIGNAL(lowerValueChanged(int)), this, SLOT(onRoiGrayMinChangeSlot(int)));
+	connect(ui->roi_range_slider, SIGNAL(upperValueChanged(int)), this, SLOT(onRoiGrayMaxChangeSlot(int)));
+	connect(ui->magnitude_thresh_slider, SIGNAL(lowerValueChanged(int)), this, SLOT(onRoiMagMinChangeSlot(int)));
+	connect(ui->magnitude_thresh_slider, SIGNAL(upperValueChanged(int)), this, SLOT(onRoiMagMaxChangeSlot(int)));
 }
 
 MainWindow::~MainWindow()
@@ -132,12 +144,26 @@ void MainWindow::onOpenDicomSlot()
 	colorTf->setInitialColorTf(vrProcess->getVolumeColorTf());
 	opacityTf->setInitialOpacityTf(vrProcess->getVolumeOpacityTf());
 
-	map<double, double> init_gradient_tf;
-	init_gradient_tf.insert(pair<double, double>(0, 1.0));
-	init_gradient_tf.insert(pair<double, double>(1185, 1.0));
-	gradientTf->setCustomizedOpacityTf(vrProcess->getVolumeGradientTf(), init_gradient_tf);
-	vrProcess->update();
+	//************************显示二维切片************************
+	dicomVisualizer->setOriginData(vrProcess->getOriginData());
+	dicomVisualizer->visualizeData();
 
+	roiVisualizer->setOriginData(dicomVisualizer->getTransferedData());
+	roiVisualizer->visualizeData();
+
+	boundVisualizer->setOriginData(roiVisualizer->getTransferedData());
+	boundVisualizer->transferData();
+	boundVisualizer->visualizeData();
+
+	//set initial gradient-opactiy render style
+	double max_gradient = boundVisualizer->getMaxBoundGradientValue();
+	double min_gradient = boundVisualizer->getMinBoundGradientValue();
+
+	gradientTf->setMaxKey(int(max_gradient));
+	gradientTf->setMinKey(int(min_gradient));
+	gradientTf->setInitialOpacityTf(vrProcess->getVolumeGradientTf());
+
+	vrProcess->update();
 	multi_render_flag = false;
 }
 
@@ -180,6 +206,8 @@ void MainWindow::onOpenNifitSlot()
 	vrProcess->update();
 
 	multi_render_flag = false;
+
+	//************************显示二维切片************************
 }
 
 
@@ -689,4 +717,40 @@ void MainWindow::onCurVolumeFlagSlot(bool check)
 			ui->gradientOpacityWidget->setVisible(false);
 		}
 	}
+}
+
+//切片图相关槽函数
+void MainWindow::onDicomSeriesSlideMoveSlot(int pos)
+{
+	dicomVisualizer->sliceMove(pos);
+	roiVisualizer->sliceMove(pos);
+	boundVisualizer->sliceMove(pos);
+}
+
+void MainWindow::onRoiGrayMinChangeSlot(int aMin)
+{
+	ui->roi_min_label->setText(QString::number(aMin));
+	if (roiVisualizer->setRoiGrayRange(aMin, roiVisualizer->getRoiRangeMax()))
+		roiVisualizer->updateVisualData();
+}
+
+void MainWindow::onRoiGrayMaxChangeSlot(int aMax)
+{
+	ui->roi_max_label->setText(QString::number(aMax));
+	if (roiVisualizer->setRoiGrayRange(roiVisualizer->getRoiRangeMin(), aMax))
+		roiVisualizer->updateVisualData();
+}
+
+void MainWindow::onRoiMagMinChangeSlot(int aMin)
+{
+	ui->magnitude_min_label->setText(QString::number(aMin));
+	if (boundVisualizer->setMagnitudeRange(aMin, boundVisualizer->getMagnitudeRangeMax()))
+		boundVisualizer->updateVisualData();
+}
+
+void MainWindow::onRoiMagMaxChangeSlot(int aMax)
+{
+	ui->magnitude_max_label->setText(QString::number(aMax));
+	if (boundVisualizer->setMagnitudeRange(boundVisualizer->getMagnitudeRangeMin(), aMax))
+		boundVisualizer->updateVisualData();
 }
