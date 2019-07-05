@@ -28,8 +28,6 @@ public:
 
 	map<double, double> getRoiBoundMagBp();
 	void kMeansCalc();
-	/*vector<int> getRoiBoundGvs();
-	vector<int> getRoiBoundGds();*/
 
 private:
 	int mag_min_threshold;
@@ -44,9 +42,5 @@ private:
 	QLabel * magnitude_max_label;
 	QLabel * magnitude_min_label;
 
-	/*multiset<int> roi_bound_gv;
-	multiset<int> roi_bound_gd;*/
-	//vector<int> roi_bound_gv;
-	//vector<int> roi_bound_gd;
 	map<double, double> roi_bound_gd;
 };

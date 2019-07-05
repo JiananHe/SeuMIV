@@ -88,6 +88,31 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->roi_range_slider, SIGNAL(upperValueChanged(int)), this, SLOT(onRoiGrayMaxChangeSlot(int)));
 	connect(ui->magnitude_thresh_slider, SIGNAL(lowerValueChanged(int)), this, SLOT(onRoiMagMinChangeSlot(int)));
 	connect(ui->magnitude_thresh_slider, SIGNAL(upperValueChanged(int)), this, SLOT(onRoiMagMaxChangeSlot(int)));
+
+	//工具按钮相关相应事件
+	connect(ui->tool_bgColor_button, SIGNAL(released()), this, SLOT(onSetBgColorSlot()));
+	connect(ui->tool_roiScalar_button, SIGNAL(released()), this, SLOT(onRoiScalarSlot()));
+	connect(ui->tool_roiGrad_button, SIGNAL(released()), this, SLOT(onRoiGradientSlot()));
+	//style菜单
+	QMenu* styleMenu = new QMenu();
+	QAction* bone_style_action = new QAction(styleMenu);
+	QAction* bone2_style_action = new QAction(styleMenu);
+	QAction* skin_style_action = new QAction(styleMenu);
+	QAction* muscle_style_action = new QAction(styleMenu);
+	bone_style_action->setText("Bone");
+	bone2_style_action->setText("Bone2");
+	skin_style_action->setText("Skin");
+	muscle_style_action->setText("Muscle");
+	styleMenu->addAction(bone_style_action);
+	styleMenu->addAction(bone2_style_action);
+	styleMenu->addAction(skin_style_action);
+	styleMenu->addAction(muscle_style_action);
+	ui->tool_style_button->setMenu(styleMenu);
+	connect(bone_style_action, SIGNAL(triggered()), this, SLOT(onSetBoneStyle()));
+	connect(bone2_style_action, SIGNAL(triggered()), this, SLOT(onSetBone2Style()));
+	connect(skin_style_action, SIGNAL(triggered()), this, SLOT(onSetSkinStyle()));
+	connect(muscle_style_action, SIGNAL(triggered()), this, SLOT(onSetMuscleStyle()));
+
 }
 
 MainWindow::~MainWindow()
@@ -199,15 +224,27 @@ void MainWindow::onOpenNifitSlot()
 	colorTf->setInitialColorTf(vrProcess->getVolumeColorTf());
 	opacityTf->setInitialOpacityTf(vrProcess->getVolumeOpacityTf());
 
-	map<double, double> init_gradient_tf;
-	init_gradient_tf.insert(pair<double, double>(0, 1.0));
-	init_gradient_tf.insert(pair<double, double>(1185, 1.0));
-	gradientTf->setCustomizedOpacityTf(vrProcess->getVolumeGradientTf(), init_gradient_tf);
-	vrProcess->update();
-
-	multi_render_flag = false;
-
 	//************************显示二维切片************************
+	dicomVisualizer->setOriginData(vrProcess->getOriginData());
+	dicomVisualizer->visualizeData();
+
+	roiVisualizer->setOriginData(dicomVisualizer->getTransferedData());
+	roiVisualizer->visualizeData();
+
+	boundVisualizer->setOriginData(roiVisualizer->getTransferedData());
+	boundVisualizer->transferData();
+	boundVisualizer->visualizeData();
+
+	//set initial gradient-opactiy render style
+	double max_gradient = boundVisualizer->getMaxBoundGradientValue();
+	double min_gradient = boundVisualizer->getMinBoundGradientValue();
+
+	gradientTf->setMaxKey(int(max_gradient));
+	gradientTf->setMinKey(int(min_gradient));
+	gradientTf->setInitialOpacityTf(vrProcess->getVolumeGradientTf());
+
+	vrProcess->update();
+	multi_render_flag = false;
 }
 
 
@@ -753,4 +790,95 @@ void MainWindow::onRoiMagMaxChangeSlot(int aMax)
 	ui->magnitude_max_label->setText(QString::number(aMax));
 	if (boundVisualizer->setMagnitudeRange(boundVisualizer->getMagnitudeRangeMin(), aMax))
 		boundVisualizer->updateVisualData();
+}
+
+//工具相关槽函数
+void MainWindow::onSetBgColorSlot()
+{
+	QColor color = QColorDialog::getColor(QColor(Qt::blue), this, QStringLiteral("选择背景颜色"));
+
+	if (color.isValid())
+	{
+		vrProcess->setBgColor(color);
+	}
+}
+
+void MainWindow::onSetBoneStyle()
+{
+	colorTf->setBoneColorTf(vrProcess->getVolumeColorTf());
+	opacityTf->setBoneOpacityTf(vrProcess->getVolumeOpacityTf());
+	vrProcess->update();
+	ui->tool_style_button->setText("Style: Bone");
+}
+
+void MainWindow::onSetBone2Style()
+{
+	colorTf->setBone2ColorTf(vrProcess->getVolumeColorTf());
+	opacityTf->setBone2OpacityTf(vrProcess->getVolumeOpacityTf());
+	vrProcess->update();
+	ui->tool_style_button->setText("Style: Bone2");
+}
+
+void MainWindow::onSetSkinStyle()
+{
+	colorTf->setSkinColorTf(vrProcess->getVolumeColorTf());
+	opacityTf->setSkinOpacityTf(vrProcess->getVolumeOpacityTf());
+	vrProcess->update();
+	ui->tool_style_button->setText("Style: Skin");
+}
+
+void MainWindow::onSetMuscleStyle()
+{
+	colorTf->setMuscleColorTf(vrProcess->getVolumeColorTf());
+	opacityTf->setMuscleOpacityTf(vrProcess->getVolumeOpacityTf());
+	vrProcess->update();
+	ui->tool_style_button->setText("Style: Muscle");
+}
+
+void MainWindow::onRoiScalarSlot()
+{
+	map<double, double> customized_gray_tf;
+	double max_gv = vrProcess->getMaxGrayValue();
+	double min_gv = vrProcess->getMinGrayValue();
+	customized_gray_tf.insert(pair<double, double>(min_gv, 0.0));
+	customized_gray_tf.insert(pair<double, double>(max_gv, 0.0));
+
+	double roi_gv_min = roiVisualizer->getRoiRangeMin();
+	double roi_gv_max = roiVisualizer->getRoiRangeMax();
+	customized_gray_tf.insert(pair<double, double>(roi_gv_min, 1.0));
+	customized_gray_tf.insert(pair<double, double>(roi_gv_max, 1.0));
+
+	if (min_gv < roi_gv_min)
+		customized_gray_tf.insert(pair<double, double>(roi_gv_min - 1, 0.0));
+	if (max_gv > roi_gv_max)
+		customized_gray_tf.insert(pair<double, double>(roi_gv_max + 1, 0.0));
+
+	ui->scalartf_x_slider->setLowerValue(min_gv);
+	ui->scalartf_x_slider->setUpperValue(max_gv);
+
+	opacityTf->setCustomizedOpacityTf(vrProcess->getVolumeOpacityTf(), customized_gray_tf);
+	vrProcess->update();
+}
+
+void MainWindow::onRoiGradientSlot()
+{
+	map<double, double> customized_mag_tf;
+	double max_gd = boundVisualizer->getMaxBoundGradientValue();
+	double min_gd = boundVisualizer->getMinBoundGradientValue();
+	customized_mag_tf.insert(pair<double, double>(min_gd, 0.0));
+	customized_mag_tf.insert(pair<double, double>(max_gd, 0.0));
+
+	double roi_gd_min = boundVisualizer->getMagnitudeRangeMin();
+	double roi_gd_max = boundVisualizer->getMagnitudeRangeMax();
+	customized_mag_tf.insert(pair<double, double>(roi_gd_min, 0.0));
+	customized_mag_tf.insert(pair<double, double>(roi_gd_max, 1.0));
+
+	if (max_gd > roi_gd_max)
+		customized_mag_tf.insert(pair<double, double>(roi_gd_max + 1, 0.0));
+
+	ui->gradienttf_x_slider->setLowerValue(min_gd);
+	ui->gradienttf_x_slider->setUpperValue(max_gd);
+
+	gradientTf->setCustomizedOpacityTf(vrProcess->getVolumeGradientTf(), customized_mag_tf);
+	vrProcess->update();
 }

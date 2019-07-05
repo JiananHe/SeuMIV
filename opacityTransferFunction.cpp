@@ -24,7 +24,7 @@ OpacityTransferFunctioin::~OpacityTransferFunctioin()
 void OpacityTransferFunctioin::setInitialOpacityTf(vtkPiecewiseFunction * volumeOpacity)
 {
 	tf_bps->removeAllPoints();
-	tf_bps->insertBreakPoint(min_key, 0.0);
+	tf_bps->insertBreakPoint(min_key, 1.0);
 	tf_bps->insertBreakPoint(max_key, 1.0);
 
 	updateVolumeOpacity(volumeOpacity);
@@ -42,9 +42,12 @@ void OpacityTransferFunctioin::setBoneOpacityTf(vtkPiecewiseFunction * volumeOpa
 
 	tf_bps->removeAllPoints();
 	tf_bps->insertBreakPoint(min_point, 0.0);
-	tf_bps->insertBreakPoint(-16, 0.0);
-	tf_bps->insertBreakPoint(641, .72);
 	tf_bps->insertBreakPoint(max_point, .71);
+
+	if (-16 >min_key && -16 < max_key)
+		tf_bps->insertBreakPoint(-16, 0.0);
+	if (641 > min_key && 641 < max_key)
+		tf_bps->insertBreakPoint(641, .72);
 
 	updateVolumeOpacity(volumeOpacity);
 
@@ -61,11 +64,16 @@ void OpacityTransferFunctioin::setBone2OpacityTf(vtkPiecewiseFunction * volumeOp
 
 	tf_bps->removeAllPoints();
 	tf_bps->insertBreakPoint(min_point, 0.0);
-	tf_bps->insertBreakPoint(143, 0.0);
-	tf_bps->insertBreakPoint(166, 0.69);
-	tf_bps->insertBreakPoint(214, 0.70);
-	tf_bps->insertBreakPoint(420, 0.83);
 	tf_bps->insertBreakPoint(max_point, 0.80);
+
+	if (143 > min_key && 143 < max_key)
+		tf_bps->insertBreakPoint(143, 0.0);
+	if (166 > min_key && 166 < max_key)
+		tf_bps->insertBreakPoint(166, 0.69);
+	if (214 > min_key && 214 < max_key)
+		tf_bps->insertBreakPoint(214, 0.70);
+	if (420 > min_key && 420 < max_key)
+		tf_bps->insertBreakPoint(420, 0.83);
 
 	updateVolumeOpacity(volumeOpacity);
 
@@ -82,9 +90,12 @@ void OpacityTransferFunctioin::setSkinOpacityTf(vtkPiecewiseFunction * volumeOpa
 
 	tf_bps->removeAllPoints();
 	tf_bps->insertBreakPoint(min_point, 0.0);
-	tf_bps->insertBreakPoint(-1000, 0.0);
-	tf_bps->insertBreakPoint(-500, 1.0);
 	tf_bps->insertBreakPoint(max_point, 1.0);
+
+	if (-1000 > min_key && -1000 < max_key)
+		tf_bps->insertBreakPoint(-1000, 0.0);
+	if (-500 > min_key && -500 < max_key)
+		tf_bps->insertBreakPoint(-500, 1.0);
 
 	updateVolumeOpacity(volumeOpacity);
 
@@ -101,10 +112,14 @@ void OpacityTransferFunctioin::setMuscleOpacityTf(vtkPiecewiseFunction * volumeO
 
 	tf_bps->removeAllPoints();
 	tf_bps->insertBreakPoint(min_point, 0.0);
-	tf_bps->insertBreakPoint(-155, 0.0);
-	tf_bps->insertBreakPoint(217, 0.68);
-	tf_bps->insertBreakPoint(420, 0.83);
 	tf_bps->insertBreakPoint(max_point, 0.80);
+
+	if (-155 > min_key && -155 < max_key)
+		tf_bps->insertBreakPoint(-155, 0.0);
+	if (217 > min_key && 217 < max_key)
+		tf_bps->insertBreakPoint(217, 0.68);
+	if (420 > min_key && 420 < max_key)
+		tf_bps->insertBreakPoint(420, 0.83);
 
 	updateVolumeOpacity(volumeOpacity);
 

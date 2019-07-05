@@ -32,7 +32,7 @@ public:
 	vtkTypeMacro(myVtkInteractorStyleImage, vtkInteractorStyleImage);
 
 protected:
-	vtkImageViewer2* _ImageViewer;
+	vtkSmartPointer<vtkImageViewer2> _ImageViewer;
 	vtkTextMapper* _StatusMapper;
 	vtkRenderWindowInteractor* interactor;
 	QSlider* _mySliderSlices;
@@ -42,7 +42,7 @@ protected:
 	int _MaxSlice;
 
 public:
-	void SetImageViewer(vtkImageViewer2* imageViewer) {
+	void SetImageViewer(vtkSmartPointer<vtkImageViewer2> imageViewer) {
 		_ImageViewer = imageViewer;
 		_MinSlice = imageViewer->GetSliceMin();
 		_MaxSlice = imageViewer->GetSliceMax();

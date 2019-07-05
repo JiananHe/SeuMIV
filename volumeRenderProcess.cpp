@@ -320,42 +320,8 @@ double VolumeRenderProcess::getMaxGrayValue()
 	return max_gv;
 }
 
-void VolumeRenderProcess::setVRMapper(const char * str_mapper)
-{
-	if (str_mapper == "ray_cast")
-	{
-		vtkSmartPointer<vtkGPUVolumeRayCastMapper> RcGpuMapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
-		if (nii_reader->GetFileName() == NULL)
-			RcGpuMapper->SetInputConnection(dicoms_reader->GetOutputPort());
-		if (dicoms_reader->GetDirectoryName() == NULL)
-			RcGpuMapper->SetInputConnection(nii_reader->GetOutputPort());
-
-		volume->SetMapper(RcGpuMapper);
-		update();
-	}
-	else if (str_mapper == "smart")
-	{
-		vtkSmartPointer<vtkSmartVolumeMapper> volumeMapperSmart = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-		if (nii_reader->GetFileName() == NULL)
-			volumeMapperSmart->SetInputConnection(dicoms_reader->GetOutputPort());
-		if (dicoms_reader->GetDirectoryName() == NULL)
-			volumeMapperSmart->SetInputConnection(nii_reader->GetOutputPort());
-
-		volume->SetMapper(volumeMapperSmart);
-		update();
-	}
-}
-
 void VolumeRenderProcess::update()
 {
-	////备份传递函数，忽略不可视传递函数
-	//if (property_id > 1)
-	//{
-	//	vtkSmartPointer<vtkPiecewiseFunction> cur_volume_opacitytf = multi_property->GetScalarOpacity(cur_volume_id);
-	//	if (cur_volume_opacitytf->GetSize() != 2 || cur_volume_opacitytf->GetValue(min_gv) != .0 || cur_volume_opacitytf->GetValue(max_gv) != .0)
-	//		multi_property_temp->SetScalarOpacity(cur_volume_id, cur_volume_opacitytf);
-	//}
-
 	volume_render->ResetCamera();
 	my_vr_widget->GetRenderWindow()->AddRenderer(volume_render);
 	my_vr_widget->GetRenderWindow()->Render();

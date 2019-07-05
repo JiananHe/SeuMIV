@@ -88,6 +88,16 @@ private slots:
 	void onRoiMagMinChangeSlot(int);
 	void onRoiMagMaxChangeSlot(int);
 
+	//工具相关槽函数
+	void onSetBgColorSlot();
+
+	void onSetBoneStyle();
+	void onSetBone2Style();
+	void onSetSkinStyle();
+	void onSetMuscleStyle();
+
+	void onRoiScalarSlot();
+	void onRoiGradientSlot();
 };
 
 #endif // MAINWINDOW_H
