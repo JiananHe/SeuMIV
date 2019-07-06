@@ -83,6 +83,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->ir_radioButton, SIGNAL(toggled(bool)), this, SLOT(onCurVolumeFlagSlot(bool)));
 
 	//二维切片图相关相应事件
+	ui->dicom_widget->installEventFilter(this);
 	connect(ui->dicom_series_slider, SIGNAL(valueChanged(int)), this, SLOT(onDicomSeriesSlideMoveSlot(int)));
 	connect(ui->roi_range_slider, SIGNAL(lowerValueChanged(int)), this, SLOT(onRoiGrayMinChangeSlot(int)));
 	connect(ui->roi_range_slider, SIGNAL(upperValueChanged(int)), this, SLOT(onRoiGrayMaxChangeSlot(int)));
@@ -508,6 +509,22 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
 			gradientTf->showCurBpValue();
 		}
 		return true;
+	}
+
+	//dicom序列图
+	if (watched == ui->dicom_widget)
+	{
+		if (event->type() == QEvent::MouseButtonRelease)
+		{
+			QPoint mp = ui->dicom_widget->mapFromGlobal(QCursor::pos());
+			double gray = dicomVisualizer->showPositionGray(mp.x(), ui->dicom_widget->geometry().height() - mp.y() - 1);
+			double mag = boundVisualizer->getPositionMag(mp.x(), ui->dicom_widget->geometry().height() - mp.y() - 1);
+			//roiVisualizer->setKMeansInitPoint(gray, mag);
+			if (mag == -10000.0)
+				dicomVisualizer->showPositionMag("None");
+			else
+				dicomVisualizer->showPositionMag(QString::number(mag, 10, 2));
+		}
 	}
 }
 

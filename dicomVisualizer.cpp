@@ -22,6 +22,14 @@ void DicomVisualizer::transferData()
 
 double DicomVisualizer::showPositionGray(int x, int y)
 {
+	vtkSmartPointer<vtkTextActor> textActor = vtkSmartPointer<vtkTextActor>::New();
+	textActor->GetTextProperty()->SetFontSize(20);
+	textActor->SetDisplayPosition(50, 50);
+
+	char coord_text[20];
+	sprintf_s(coord_text, "X=%d Y=%d Z=%d", x, y, viewer->GetSlice());
+	textActor->SetInput(coord_text);
+
 	////show coords
 	//dicom_coords_label->setText("X=" + QString::number(x) + " Y=" + QString::number(y) + " Z=" + QString::number(viewer->GetSlice()));
 
@@ -68,6 +76,9 @@ double DicomVisualizer::showPositionGray(int x, int y)
 	//	dicom_gray_label->setText("None");
 	//	return -10000.0;
 	//}
+
+	viewer->GetRenderer()->AddActor(textActor);
+	viewer->Render();
 	return 0;
 }
 

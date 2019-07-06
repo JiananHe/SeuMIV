@@ -1,5 +1,6 @@
 #pragma once
 #include "seriesVisualizer.h"
+#include<vtkTextActor.h>
 
 class DicomVisualizer : public SeriesVisualizer
 {
