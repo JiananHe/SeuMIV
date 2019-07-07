@@ -273,7 +273,7 @@ border:0px</string>
        <number>0</number>
       </property>
       <widget class="QWidget" name="view2D">
-       <layout class="QHBoxLayout" name="horizontalLayout">
+       <layout class="QHBoxLayout" name="view2DLayout">
         <property name="spacing">
          <number>0</number>
         </property>
@@ -388,7 +388,7 @@ background-color: rgb(0, 0, 0);</string>
            <string notr="true">background-color: rgb(130, 135, 160);
 </string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_6">
+          <layout class="QVBoxLayout" name="sidebarLayout">
            <property name="spacing">
             <number>0</number>
            </property>
@@ -405,14 +405,14 @@ background-color: rgb(0, 0, 0);</string>
             <number>0</number>
            </property>
            <item>
-            <widget class="QWidget" name="widget_01" native="true">
+            <widget class="QWidget" name="imageView" native="true">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
                <verstretch>1</verstretch>
               </sizepolicy>
              </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <layout class="QHBoxLayout" name="imageViewLayout">
               <property name="spacing">
                <number>0</number>
               </property>
@@ -429,7 +429,7 @@ background-color: rgb(0, 0, 0);</string>
                <number>0</number>
               </property>
               <item>
-               <widget class="QLabel" name="label">
+               <widget class="QLabel" name="imageViewLabel">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                   <horstretch>0</horstretch>
@@ -459,7 +459,7 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:0.5, x2:0.5, y2:-1, sto
             </widget>
            </item>
            <item>
-            <widget class="QWidget" name="widget_02" native="true">
+            <widget class="QWidget" name="function2D" native="true">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -472,7 +472,7 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:0.5, x2:0.5, y2:-1, sto
                <height>36</height>
               </size>
              </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <layout class="QHBoxLayout" name="function2DLayout">
               <property name="spacing">
                <number>9</number>
               </property>
@@ -489,7 +489,7 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:0.5, x2:0.5, y2:-1, sto
                <number>0</number>
               </property>
               <item>
-               <widget class="QPushButton" name="pushButton_2">
+               <widget class="QPushButton" name="button_MPR">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                   <horstretch>1</horstretch>
@@ -550,7 +550,7 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:1.5, x2:0.5, y2:0, stop
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton_3">
+               <widget class="QPushButton" name="button_CPR">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                   <horstretch>1</horstretch>
@@ -585,7 +585,7 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:1.5, x2:0.5, y2:-0.7, s
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton_4">
+               <widget class="QPushButton" name="button_Blend">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                   <horstretch>1</horstretch>
@@ -622,7 +622,7 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:1.5, x2:0.5, y2:-0.7, s
             </widget>
            </item>
            <item>
-            <widget class="QWidget" name="widget_03" native="true">
+            <widget class="QWidget" name="dynamicWidget" native="true">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -635,7 +635,7 @@ border-top:2px solid rgb(100, 100, 100);
 border-bottom:2px solid rgb(200, 200, 200);
 }</string>
              </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <layout class="QHBoxLayout" name="dynamicLayout">
               <property name="leftMargin">
                <number>8</number>
               </property>
@@ -649,8 +649,8 @@ border-bottom:2px solid rgb(200, 200, 200);
                <number>5</number>
               </property>
               <item>
-               <widget class="QWidget" name="widget" native="true">
-                <layout class="QHBoxLayout" name="horizontalLayout_48">
+               <widget class="QWidget" name="windowLevel_1" native="true">
+                <layout class="QHBoxLayout" name="windowLevelLayout_1">
                  <property name="leftMargin">
                   <number>0</number>
                  </property>
@@ -664,7 +664,7 @@ border-bottom:2px solid rgb(200, 200, 200);
                   <number>0</number>
                  </property>
                  <item>
-                  <widget class="QWidget" name="widget_46" native="true">
+                  <widget class="QWidget" name="showWL" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>5</horstretch>
@@ -674,9 +674,9 @@ border-bottom:2px solid rgb(200, 200, 200);
                    <property name="styleSheet">
                     <string notr="true">background-color: rgb(245, 245, 255);</string>
                    </property>
-                   <layout class="QHBoxLayout" name="horizontalLayout_6">
+                   <layout class="QHBoxLayout" name="showWLLayout">
                     <item>
-                     <widget class="QLabel" name="label_2">
+                     <widget class="QLabel" name="windowWidth">
                       <property name="font">
                        <font>
                         <family>Times New Roman</family>
@@ -690,7 +690,7 @@ border-bottom:2px solid rgb(200, 200, 200);
                      </widget>
                     </item>
                     <item>
-                     <widget class="QLineEdit" name="lineEdit">
+                     <widget class="QLineEdit" name="WWEdit">
                       <property name="font">
                        <font>
                         <family>Times New Roman</family>
@@ -707,7 +707,7 @@ border:none;</string>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QLabel" name="label_3">
+                     <widget class="QLabel" name="windowLevel_2">
                       <property name="font">
                        <font>
                         <family>Times New Roman</family>
@@ -721,7 +721,7 @@ border:none;</string>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QLineEdit" name="lineEdit_2">
+                     <widget class="QLineEdit" name="WLEdit">
                       <property name="font">
                        <font>
                         <family>Times New Roman</family>
@@ -778,14 +778,14 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:0.5, x2:0.5, y2:-0.3, s
             </widget>
            </item>
            <item>
-            <widget class="QWidget" name="widget_04" native="true">
+            <widget class="QWidget" name="windowControl" native="true">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
                <verstretch>2</verstretch>
               </sizepolicy>
              </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <layout class="QHBoxLayout" name="windowControlLayout">
               <property name="leftMargin">
                <number>8</number>
               </property>
@@ -799,7 +799,7 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:0.5, x2:0.5, y2:-0.3, s
                <number>0</number>
               </property>
               <item>
-               <widget class="QLabel" name="label_4">
+               <widget class="QLabel" name="windowControlLabel">
                 <property name="font">
                  <font>
                   <family>Microsoft YaHei</family>
@@ -817,7 +817,7 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:0.5, x2:0.5, y2:-0.3, s
             </widget>
            </item>
            <item>
-            <widget class="QWidget" name="widget_05" native="true">
+            <widget class="QWidget" name="windowControlButton" native="true">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -827,7 +827,7 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:0.5, x2:0.5, y2:-0.3, s
              <property name="styleSheet">
               <string notr="true"/>
              </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_18">
+             <layout class="QHBoxLayout" name="windowControlButtonLayout">
               <property name="spacing">
                <number>0</number>
               </property>
@@ -844,11 +844,11 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:0.5, x2:0.5, y2:-0.3, s
                <number>0</number>
               </property>
               <item>
-               <widget class="QWidget" name="widget_18" native="true">
+               <widget class="QWidget" name="windowControlButton_1" native="true">
                 <property name="styleSheet">
                  <string notr="true">border:1px solid rgb(255,255,255);</string>
                 </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_33">
+                <layout class="QHBoxLayout" name="windowControlButtonLayout_1">
                  <property name="spacing">
                   <number>0</number>
                  </property>
@@ -865,7 +865,7 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:0.5, x2:0.5, y2:-0.3, s
                   <number>1</number>
                  </property>
                  <item>
-                  <widget class="QWidget" name="widget_30" native="true">
+                  <widget class="QWidget" name="windowControlButton_2" native="true">
                    <property name="styleSheet">
                     <string notr="true">QPushButton{
 background-color: qlineargradient(spread:pad, x1:0.5, y1:0.5, x2:0.5, y2:-0.5, stop:0 rgba(46, 51, 138, 255), stop:1 rgba(255, 255, 255, 255));
@@ -874,7 +874,7 @@ border-radius:10px;
 QPushButton:pressed{
 background-color: qlineargradient(spread:pad, x1:0.5, y1:0.5, x2:0.5, y2:-0.3, stop:0 rgb(88, 88, 200, 255), stop:1 rgba(255, 255, 255, 255));
 }
-QWidget#widget_30{
+QWidget#windowControlButton_2{
 background-color: rgb(245, 245, 255);
 border:1px solid rgb(150,150,150);
 }
@@ -884,7 +884,7 @@ background: #FFFFDC;
 color: rgb(0,0,0);
 }</string>
                    </property>
-                   <layout class="QGridLayout" name="gridLayout">
+                   <layout class="QGridLayout" name="windowControlButtonLayout_2">
                     <property name="leftMargin">
                      <number>0</number>
                     </property>
@@ -901,7 +901,7 @@ color: rgb(0,0,0);
                      <number>5</number>
                     </property>
                     <item row="0" column="0">
-                     <widget class="QPushButton" name="button3">
+                     <widget class="QPushButton" name="button_Four">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -936,7 +936,7 @@ color: rgb(0,0,0);
                      </widget>
                     </item>
                     <item row="0" column="1">
-                     <widget class="QPushButton" name="button2">
+                     <widget class="QPushButton" name="button_Transverse">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -971,7 +971,7 @@ color: rgb(0,0,0);
                      </widget>
                     </item>
                     <item row="0" column="2">
-                     <widget class="QPushButton" name="button0">
+                     <widget class="QPushButton" name="button_Sagittal">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1006,7 +1006,7 @@ color: rgb(0,0,0);
                      </widget>
                     </item>
                     <item row="0" column="3">
-                     <widget class="QPushButton" name="button1">
+                     <widget class="QPushButton" name="button_Coronal">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1041,7 +1041,7 @@ color: rgb(0,0,0);
                      </widget>
                     </item>
                     <item row="1" column="0">
-                     <widget class="QPushButton" name="button4">
+                     <widget class="QPushButton" name="button_First">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1076,7 +1076,7 @@ color: rgb(0,0,0);
                      </widget>
                     </item>
                     <item row="1" column="1">
-                     <widget class="QPushButton" name="button5">
+                     <widget class="QPushButton" name="button_Prev">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1111,7 +1111,7 @@ color: rgb(0,0,0);
                      </widget>
                     </item>
                     <item row="1" column="2">
-                     <widget class="QPushButton" name="button6">
+                     <widget class="QPushButton" name="button_Next">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1146,7 +1146,7 @@ color: rgb(0,0,0);
                      </widget>
                     </item>
                     <item row="1" column="3">
-                     <widget class="QPushButton" name="button7">
+                     <widget class="QPushButton" name="button_Last">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1190,7 +1190,7 @@ color: rgb(0,0,0);
             </widget>
            </item>
            <item>
-            <widget class="QWidget" name="widget_06" native="true">
+            <widget class="QWidget" name="dynamicWidget_2" native="true">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -1202,7 +1202,7 @@ color: rgb(0,0,0);
 background-color: rgb(255,255,255);
 }</string>
              </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_19">
+             <layout class="QHBoxLayout" name="dynamicLayout_2">
               <property name="leftMargin">
                <number>8</number>
               </property>
@@ -1216,8 +1216,8 @@ background-color: rgb(255,255,255);
                <number>5</number>
               </property>
               <item>
-               <widget class="QWidget" name="widget_19" native="true">
-                <layout class="QHBoxLayout" name="horizontalLayout_20">
+               <widget class="QWidget" name="showSlices" native="true">
+                <layout class="QHBoxLayout" name="showSlicesLayout">
                  <property name="leftMargin">
                   <number>0</number>
                  </property>
@@ -1231,7 +1231,7 @@ background-color: rgb(255,255,255);
                   <number>5</number>
                  </property>
                  <item>
-                  <widget class="QLabel" name="label_13">
+                  <widget class="QLabel" name="showSlicesLabel">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>1</horstretch>
@@ -1252,7 +1252,7 @@ background-color: rgb(255,255,255);
                   </widget>
                  </item>
                  <item>
-                  <widget class="QComboBox" name="comboBox">
+                  <widget class="QComboBox" name="comboBox_slices">
                    <property name="enabled">
                     <bool>true</bool>
                    </property>
@@ -1399,14 +1399,14 @@ background-color: rgb(255,255,255);
             </widget>
            </item>
            <item>
-            <widget class="QWidget" name="widget_16" native="true">
+            <widget class="QWidget" name="Tool_2D" native="true">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
                <verstretch>2</verstretch>
               </sizepolicy>
              </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_21">
+             <layout class="QHBoxLayout" name="Tool_2DLayout">
               <property name="leftMargin">
                <number>8</number>
               </property>
@@ -1420,7 +1420,7 @@ background-color: rgb(255,255,255);
                <number>0</number>
               </property>
               <item>
-               <widget class="QLabel" name="label_14">
+               <widget class="QLabel" name="Tool_2DLabel">
                 <property name="font">
                  <font>
                   <family>Microsoft YaHei</family>
@@ -1438,14 +1438,14 @@ background-color: rgb(255,255,255);
             </widget>
            </item>
            <item>
-            <widget class="QWidget" name="widget_17" native="true">
+            <widget class="QWidget" name="Tool_Buttons_2D" native="true">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
                <verstretch>6</verstretch>
               </sizepolicy>
              </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_22">
+             <layout class="QHBoxLayout" name="Tool_Buttons_2DLayout">
               <property name="spacing">
                <number>0</number>
               </property>
@@ -1465,11 +1465,11 @@ background-color: rgb(255,255,255);
                <number>10</number>
               </property>
               <item>
-               <widget class="QWidget" name="widget_20" native="true">
+               <widget class="QWidget" name="Tool_Buttons_2D_1" native="true">
                 <property name="styleSheet">
                  <string notr="true">border: 1px solid rgb(255, 255, 255);</string>
                 </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_34">
+                <layout class="QHBoxLayout" name="Tool_Buttons_2DLayout_1">
                  <property name="spacing">
                   <number>0</number>
                  </property>
@@ -1486,7 +1486,7 @@ background-color: rgb(255,255,255);
                   <number>1</number>
                  </property>
                  <item>
-                  <widget class="QWidget" name="widget_31" native="true">
+                  <widget class="QWidget" name="Tool_Buttons_2D_2" native="true">
                    <property name="styleSheet">
                     <string notr="true">QPushButton{
 background-color: qlineargradient(spread:pad, x1:0.5, y1:0.5, x2:0.5, y2:-0.5, stop:0 rgba(46, 51, 138, 255), stop:1 rgba(255, 255, 255, 255));
@@ -1495,7 +1495,7 @@ border-radius:10px;
 QPushButton:pressed{
 background-color: qlineargradient(spread:pad, x1:0.5, y1:0.5, x2:0.5, y2:-0.3, stop:0 rgb(88, 88, 200, 255), stop:1 rgba(255, 255, 255, 255));
 }
-QWidget#widget_31{
+QWidget#Tool_Buttons_2D_2{
 background-color: rgb(245, 245, 255);
 border: 1px solid rgb(150,150,150);
 }
@@ -1505,7 +1505,7 @@ background: #FFFFDC;
 color: rgb(0,0,0);
 }</string>
                    </property>
-                   <layout class="QGridLayout" name="gridLayout_2">
+                   <layout class="QGridLayout" name="Tool_Buttons_2DLayout_2">
                     <property name="leftMargin">
                      <number>0</number>
                     </property>
@@ -1522,7 +1522,7 @@ color: rgb(0,0,0);
                      <number>5</number>
                     </property>
                     <item row="0" column="0">
-                     <widget class="QPushButton" name="pushButton_22">
+                     <widget class="QPushButton" name="button_Reset">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1557,7 +1557,7 @@ color: rgb(0,0,0);
                      </widget>
                     </item>
                     <item row="0" column="1">
-                     <widget class="QPushButton" name="pushButton_23">
+                     <widget class="QPushButton" name="button_Hand">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1592,7 +1592,7 @@ color: rgb(0,0,0);
                      </widget>
                     </item>
                     <item row="0" column="2">
-                     <widget class="QPushButton" name="pushButton_24">
+                     <widget class="QPushButton" name="button_ZoomIn">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1627,7 +1627,7 @@ color: rgb(0,0,0);
                      </widget>
                     </item>
                     <item row="0" column="3">
-                     <widget class="QPushButton" name="pushButton_25">
+                     <widget class="QPushButton" name="button_ZoomOut">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1662,7 +1662,7 @@ color: rgb(0,0,0);
                      </widget>
                     </item>
                     <item row="1" column="0">
-                     <widget class="QPushButton" name="pushButton_26">
+                     <widget class="QPushButton" name="button_Rotate">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1697,7 +1697,7 @@ color: rgb(0,0,0);
                      </widget>
                     </item>
                     <item row="1" column="1">
-                     <widget class="QPushButton" name="pushButton_27">
+                     <widget class="QPushButton" name="button_IRotate">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1732,7 +1732,7 @@ color: rgb(0,0,0);
                      </widget>
                     </item>
                     <item row="1" column="2">
-                     <widget class="QPushButton" name="pushButton_28">
+                     <widget class="QPushButton" name="button_MD">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1767,7 +1767,7 @@ color: rgb(0,0,0);
                      </widget>
                     </item>
                     <item row="1" column="3">
-                     <widget class="QPushButton" name="pushButton_29">
+                     <widget class="QPushButton" name="button_MA">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1802,7 +1802,7 @@ color: rgb(0,0,0);
                      </widget>
                     </item>
                     <item row="2" column="0">
-                     <widget class="QPushButton" name="pushButton_31">
+                     <widget class="QPushButton" name="button_w1">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1837,7 +1837,7 @@ color: rgb(0,0,0);
                      </widget>
                     </item>
                     <item row="2" column="1">
-                     <widget class="QPushButton" name="pushButton_30">
+                     <widget class="QPushButton" name="button_w2">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1872,7 +1872,7 @@ color: rgb(0,0,0);
                      </widget>
                     </item>
                     <item row="2" column="2">
-                     <widget class="QPushButton" name="pushButton_33">
+                     <widget class="QPushButton" name="button_w3">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1900,7 +1900,7 @@ color: rgb(0,0,0);
                      </widget>
                     </item>
                     <item row="2" column="3">
-                     <widget class="QPushButton" name="pushButton_32">
+                     <widget class="QPushButton" name="button_w4">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -1942,7 +1942,7 @@ color: rgb(0,0,0);
        </layout>
       </widget>
       <widget class="QWidget" name="hidePage">
-       <widget class="QWidget" name="widget_38" native="true">
+       <widget class="QWidget" name="OpenNIFTIFile" native="true">
         <property name="geometry">
          <rect>
           <x>230</x>
@@ -1951,7 +1951,7 @@ color: rgb(0,0,0);
           <height>60</height>
          </rect>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_41">
+        <layout class="QHBoxLayout" name="OpenNIFTIFileLayout">
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -1965,7 +1965,7 @@ color: rgb(0,0,0);
           <number>0</number>
          </property>
          <item>
-          <widget class="QPushButton" name="pushButton_34">
+          <widget class="QPushButton" name="button_OpenNF">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -1997,7 +1997,7 @@ color: rgb(0,0,0);
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_67">
+          <widget class="QPushButton" name="button_OpenNSF">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -2030,7 +2030,7 @@ color: rgb(0,0,0);
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="widget_42" native="true">
+       <widget class="QWidget" name="CPR_Option" native="true">
         <property name="geometry">
          <rect>
           <x>290</x>
@@ -2048,7 +2048,7 @@ color: rgb(0,0,0);
         <property name="styleSheet">
          <string notr="true"/>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_9">
+        <layout class="QVBoxLayout" name="CPROptionLayout">
          <property name="spacing">
           <number>0</number>
          </property>
@@ -2065,7 +2065,7 @@ color: rgb(0,0,0);
           <number>5</number>
          </property>
          <item>
-          <widget class="QWidget" name="widget_43" native="true">
+          <widget class="QWidget" name="CPR_Interpolation" native="true">
            <layout class="QHBoxLayout" name="horizontalLayout_45">
             <property name="leftMargin">
              <number>0</number>
@@ -2080,7 +2080,7 @@ color: rgb(0,0,0);
              <number>5</number>
             </property>
             <item>
-             <widget class="QLabel" name="label_20">
+             <widget class="QLabel" name="interpolationLabel">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>2</horstretch>
@@ -2101,7 +2101,7 @@ color: rgb(0,0,0);
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="comboBox_6">
+             <widget class="QComboBox" name="interpolationComboBox">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>5</horstretch>
@@ -2140,7 +2140,7 @@ color: rgb(0,0,0);
           </widget>
          </item>
          <item>
-          <widget class="QWidget" name="widget_44" native="true">
+          <widget class="QWidget" name="CPR_CurveFit" native="true">
            <layout class="QHBoxLayout" name="horizontalLayout_46">
             <property name="leftMargin">
              <number>0</number>
@@ -2155,7 +2155,7 @@ color: rgb(0,0,0);
              <number>5</number>
             </property>
             <item>
-             <widget class="QLabel" name="label_21">
+             <widget class="QLabel" name="curveFitLabel">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>2</horstretch>
@@ -2176,7 +2176,7 @@ color: rgb(0,0,0);
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="comboBox_7">
+             <widget class="QComboBox" name="curveFitComboBox">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>5</horstretch>
@@ -2209,7 +2209,7 @@ color: rgb(0,0,0);
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="widget_45" native="true">
+       <widget class="QWidget" name="showNIFTI" native="true">
         <property name="geometry">
          <rect>
           <x>310</x>
@@ -2224,7 +2224,7 @@ color: rgb(0,0,0);
           <verstretch>4</verstretch>
          </sizepolicy>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_47">
+        <layout class="QHBoxLayout" name="showNIFTILayout">
          <property name="leftMargin">
           <number>8</number>
          </property>
@@ -2238,7 +2238,7 @@ color: rgb(0,0,0);
           <number>5</number>
          </property>
          <item>
-          <widget class="QRadioButton" name="radioButton_2">
+          <widget class="QRadioButton" name="NIFTIRadioButton">
            <property name="enabled">
             <bool>true</bool>
            </property>
@@ -2265,7 +2265,7 @@ color: rgb(0,0,0);
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="comboBox_8">
+          <widget class="QComboBox" name="NIFTIFileComboBox">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>3</horstretch>
@@ -2291,8 +2291,8 @@ color: rgb(0,0,0);
        <widget class="QWidget" name="cpr" native="true">
         <property name="geometry">
          <rect>
-          <x>820</x>
-          <y>50</y>
+          <x>670</x>
+          <y>30</y>
           <width>720</width>
           <height>711</height>
          </rect>

@@ -16,26 +16,28 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->stackedWidget->setCurrentIndex(0);
 
 	//添加隐藏的widget
-	ui->horizontalLayout_5->addWidget(ui->widget_38);
-	ui->widget_38->hide();
-	ui->horizontalLayout_19->addWidget(ui->widget_42);
-	ui->widget_42->hide();
-	ui->horizontalLayout_19->addWidget(ui->widget_45);
-	ui->widget_45->hide();
+	ui->dynamicLayout->addWidget(ui->OpenNIFTIFile);
+	ui->OpenNIFTIFile->hide();
+	ui->dynamicLayout_2->addWidget(ui->CPR_Option);
+	ui->CPR_Option->hide();
+	ui->dynamicLayout_2->addWidget(ui->showNIFTI);
+	ui->showNIFTI->hide();
 	ui->verticalLayout->addWidget(ui->cpr);
 	ui->cpr->hide();
 	ui->verticalLayout->addWidget(ui->blend);
 	ui->blend->hide();
-	ui->widget_19->hide();
-	ui->pushButton_30->hide();
-	ui->pushButton_31->hide();
-	ui->pushButton_32->hide();
-	ui->pushButton_33->hide();
+	ui->showSlices->hide();
 
-	//设置lineEdit输入限制
+	//隐藏按钮
+	ui->button_w1->hide();
+	ui->button_w2->hide();
+	ui->button_w3->hide();
+	ui->button_w4->hide();
+
+	//设置窗宽、窗位lineEdit输入限制
 	QRegExp regExp("^-?\\d{1,4}(\\.\\d)?");
-	ui->lineEdit->setValidator(new QRegExpValidator(regExp, this));
-	ui->lineEdit_2->setValidator(new QRegExpValidator(regExp, this));
+	ui->WWEdit->setValidator(new QRegExpValidator(regExp, this));
+	ui->WLEdit->setValidator(new QRegExpValidator(regExp, this));
 
 	mpr = new View2D(ui->mpr);
 	cpr = new View2D(ui->cpr);
@@ -50,48 +52,52 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->minimize, &QPushButton::released, this, &MainWindow::minimize);
 
 	//切换二维显示页面--切换子控件
-	connect(ui->pushButton_2, &QPushButton::released, this, &MainWindow::show2DMPR);
-	connect(ui->pushButton_3, &QPushButton::released, this, &MainWindow::show2DCPR);
-	connect(ui->pushButton_4, &QPushButton::released, this, &MainWindow::show2DBlend);
+	connect(ui->button_MPR, &QPushButton::released, this, &MainWindow::show2DMPR);
+	connect(ui->button_CPR, &QPushButton::released, this, &MainWindow::show2DCPR);
+	connect(ui->button_Blend, &QPushButton::released, this, &MainWindow::show2DBlend);
 
 	connect(ui->openFile, &QPushButton::released, this, &MainWindow::openFile);
 
 	//切换2D界面窗口布局
 	QSignalMapper *signalMapper = new QSignalMapper(this);
-	connect(ui->button0, SIGNAL(released()), signalMapper, SLOT(map()));
-	connect(ui->button1, SIGNAL(released()), signalMapper, SLOT(map()));
-	connect(ui->button2, SIGNAL(released()), signalMapper, SLOT(map()));
-	connect(ui->button3, SIGNAL(released()), signalMapper, SLOT(map()));
+	connect(ui->button_Sagittal, SIGNAL(released()), signalMapper, SLOT(map()));
+	connect(ui->button_Coronal, SIGNAL(released()), signalMapper, SLOT(map()));
+	connect(ui->button_Transverse, SIGNAL(released()), signalMapper, SLOT(map()));
+	connect(ui->button_Four, SIGNAL(released()), signalMapper, SLOT(map()));
 
-	signalMapper->setMapping(ui->button0, 0);
-	signalMapper->setMapping(ui->button1, 1);
-	signalMapper->setMapping(ui->button2, 2);
-	signalMapper->setMapping(ui->button3, 3);
+	signalMapper->setMapping(ui->button_Sagittal, 0);
+	signalMapper->setMapping(ui->button_Coronal, 1);
+	signalMapper->setMapping(ui->button_Transverse, 2);
+	signalMapper->setMapping(ui->button_Four, 3);
 
 	connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(change2DView(int)));
 
-	//切换切片
+	//切换切片-上一张、下一张、第一张、最后一张
 	QSignalMapper *signalMapper2 = new QSignalMapper(this);
-	connect(ui->button4, SIGNAL(released()), signalMapper2, SLOT(map()));
-	connect(ui->button5, SIGNAL(released()), signalMapper2, SLOT(map()));
-	connect(ui->button6, SIGNAL(released()), signalMapper2, SLOT(map()));
-	connect(ui->button7, SIGNAL(released()), signalMapper2, SLOT(map()));
+	connect(ui->button_First, SIGNAL(released()), signalMapper2, SLOT(map()));
+	connect(ui->button_Prev, SIGNAL(released()), signalMapper2, SLOT(map()));
+	connect(ui->button_Next, SIGNAL(released()), signalMapper2, SLOT(map()));
+	connect(ui->button_Last, SIGNAL(released()), signalMapper2, SLOT(map()));
 
-	signalMapper2->setMapping(ui->button4, 3);
-	signalMapper2->setMapping(ui->button5, 1);
-	signalMapper2->setMapping(ui->button6, 2);
-	signalMapper2->setMapping(ui->button7, 4);
+	signalMapper2->setMapping(ui->button_First, 3);
+	signalMapper2->setMapping(ui->button_Prev, 1);
+	signalMapper2->setMapping(ui->button_Next, 2);
+	signalMapper2->setMapping(ui->button_Last, 4);
 
 	connect(signalMapper2, SIGNAL(mapped(int)), this, SLOT(OnChangeSlice(int)));
 
 	//读取NIFTI文件
-	connect(ui->pushButton_34, &QPushButton::released, this, &MainWindow::openOriginalFile);
-	connect(ui->pushButton_67, &QPushButton::released, this, &MainWindow::openSegmentFile);
-	connect(ui->comboBox_8, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &MainWindow::OnClickNiiFilesComboBox);
-	connect(ui->radioButton_2, &QRadioButton::clicked, this, &MainWindow::OnChangeNiiFileVisible);
+	connect(ui->button_OpenNF, &QPushButton::released, this, &MainWindow::openOriginalFile);
+	connect(ui->button_OpenNSF, &QPushButton::released, this, &MainWindow::openSegmentFile);
 
-	connect(ui->comboBox_6, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &MainWindow::OnInterpolationMethodChanged);
-	connect(ui->comboBox_7, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &MainWindow::OnCurveFitMethodChanged);
+	//切换NIFTI文件可视状态
+	connect(ui->NIFTIFileComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &MainWindow::OnClickNiiFilesComboBox);
+	connect(ui->NIFTIRadioButton, &QRadioButton::clicked, this, &MainWindow::OnChangeNiiFileVisible);
+
+	//切换CPR插值方式
+	connect(ui->interpolationComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &MainWindow::OnInterpolationMethodChanged);
+	//切换CPR曲线拟合方式
+	connect(ui->curveFitComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &MainWindow::OnCurveFitMethodChanged);
 
 	//设置、更新窗宽窗位
 	connect(cpr, &View2D::changeWindowLevel, this, &MainWindow::OnChangeWindowLevel);
@@ -99,14 +105,14 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->setWL, &QPushButton::released, this, &MainWindow::SetWindowLevel);
 
 	//绑定工具按钮事件
-	connect(ui->pushButton_22, &QPushButton::released, this, &MainWindow::OnReset);
-	connect(ui->pushButton_23, &QPushButton::released, this, &MainWindow::OnHand);
-	connect(ui->pushButton_24, &QPushButton::released, this, &MainWindow::OnZoomIn);
-	connect(ui->pushButton_25, &QPushButton::released, this, &MainWindow::OnZoomOut);
-	connect(ui->pushButton_26, &QPushButton::released, this, &MainWindow::OnClockwiseRotate);
-	connect(ui->pushButton_27, &QPushButton::released, this, &MainWindow::OnContraRotate);
-	connect(ui->pushButton_28, &QPushButton::released, this, &MainWindow::OnMeasureDistance);
-	connect(ui->pushButton_29, &QPushButton::released, this, &MainWindow::OnMeasureAngle);
+	connect(ui->button_Reset, &QPushButton::released, this, &MainWindow::OnReset);
+	connect(ui->button_Hand, &QPushButton::released, this, &MainWindow::OnHand);
+	connect(ui->button_ZoomIn, &QPushButton::released, this, &MainWindow::OnZoomIn);
+	connect(ui->button_ZoomOut, &QPushButton::released, this, &MainWindow::OnZoomOut);
+	connect(ui->button_Rotate, &QPushButton::released, this, &MainWindow::OnClockwiseRotate);
+	connect(ui->button_IRotate, &QPushButton::released, this, &MainWindow::OnContraRotate);
+	connect(ui->button_MD, &QPushButton::released, this, &MainWindow::OnMeasureDistance);
+	connect(ui->button_MA, &QPushButton::released, this, &MainWindow::OnMeasureAngle);
 }
 
 void MainWindow::onView2DSlot()
@@ -128,16 +134,14 @@ void MainWindow::show2DMPR() {
 	if (current2DState == 1)
 		return;
 
-	ui->widget_38->hide();
-	ui->widget_42->hide();
-	ui->widget_45->hide();
+	ui->OpenNIFTIFile->hide();
+	ui->CPR_Option->hide();
+	ui->showNIFTI->hide();
 
-	ui->widget_19->hide();
-
-	ui->widget->show();
-	ui->pushButton_2->setStyleSheet(VIEW2D_BUTTON_SELECTED_STYLE);
-	ui->pushButton_3->setStyleSheet(VIEW2D_BUTTON_UNSELECTED_STYLE);
-	ui->pushButton_4->setStyleSheet(VIEW2D_BUTTON_UNSELECTED_STYLE);
+	ui->windowLevel_1->show();
+	ui->button_MPR->setStyleSheet(VIEW2D_BUTTON_SELECTED_STYLE);
+	ui->button_CPR->setStyleSheet(VIEW2D_BUTTON_UNSELECTED_STYLE);
+	ui->button_Blend->setStyleSheet(VIEW2D_BUTTON_UNSELECTED_STYLE);
 
 	ui->mpr->show();
 	ui->blend->hide();
@@ -151,14 +155,13 @@ void MainWindow::show2DCPR() {
 	if (current2DState == 2)
 		return;
 
-	ui->widget_38->hide();
-	ui->widget_19->hide();
-	ui->widget_45->hide();
-	ui->widget_42->show();
-	ui->widget->show();
-	ui->pushButton_2->setStyleSheet(VIEW2D_BUTTON_UNSELECTED_STYLE);
-	ui->pushButton_3->setStyleSheet(VIEW2D_BUTTON_SELECTED_STYLE);
-	ui->pushButton_4->setStyleSheet(VIEW2D_BUTTON_UNSELECTED_STYLE);
+	ui->OpenNIFTIFile->hide();
+	ui->showNIFTI->hide();
+	ui->CPR_Option->show();
+	ui->windowLevel_1->show();
+	ui->button_MPR->setStyleSheet(VIEW2D_BUTTON_UNSELECTED_STYLE);
+	ui->button_CPR->setStyleSheet(VIEW2D_BUTTON_SELECTED_STYLE);
+	ui->button_Blend->setStyleSheet(VIEW2D_BUTTON_UNSELECTED_STYLE);
 
 	ui->mpr->hide();
 	ui->blend->hide();
@@ -172,14 +175,13 @@ void MainWindow::show2DBlend() {
 	if (current2DState == 3)
 		return;
 
-	ui->widget->hide();
-	ui->widget_19->hide();
-	ui->widget_42->hide();
-	ui->widget_45->show();
-	ui->widget_38->show();
-	ui->pushButton_2->setStyleSheet(VIEW2D_BUTTON_UNSELECTED_STYLE);
-	ui->pushButton_3->setStyleSheet(VIEW2D_BUTTON_UNSELECTED_STYLE);
-	ui->pushButton_4->setStyleSheet(VIEW2D_BUTTON_SELECTED_STYLE);
+	ui->windowLevel_1->hide();
+	ui->CPR_Option->hide();
+	ui->showNIFTI->show();
+	ui->OpenNIFTIFile->show();
+	ui->button_MPR->setStyleSheet(VIEW2D_BUTTON_UNSELECTED_STYLE);
+	ui->button_CPR->setStyleSheet(VIEW2D_BUTTON_UNSELECTED_STYLE);
+	ui->button_Blend->setStyleSheet(VIEW2D_BUTTON_SELECTED_STYLE);
 
 	ui->mpr->hide();
 	ui->cpr->hide();
@@ -196,7 +198,7 @@ void MainWindow::minimize()
 
 void MainWindow::openFile()
 {
-	QString path = QFileDialog::getExistingDirectory(this, QStringLiteral("打开文件或文件夹"), "E:/yzc/vtk");
+	QString path = QFileDialog::getExistingDirectory(this, QStringLiteral("打开文件或文件夹"), ".");
 	if (path.isEmpty() || path.isNull())
 		return;
 	qDebug() << path << endl;
@@ -311,19 +313,19 @@ void MainWindow::openOriginalFile()
 
 	blend->DisplayOrignalFile(fileName);
 
-	ui->comboBox_8->clear();
+	ui->NIFTIFileComboBox->clear();
 	niiFiles.clear();
 	niiFilesVisbile.clear();
 
 	QString name = file.mid(file.lastIndexOf('/') + 1);
 	name = name.left(name.indexOf('.'));
-	ui->radioButton_2->setCheckable(true);
-	ui->radioButton_2->setChecked(true);
+	ui->NIFTIRadioButton->setCheckable(true);
+	ui->NIFTIRadioButton->setChecked(true);
 	niiFiles.push_back(name);
 	niiFilesVisbile.push_back(true);
 
-	ui->comboBox_8->addItem(name);
-	ui->comboBox_8->setCurrentText(name);
+	ui->NIFTIFileComboBox->addItem(name);
+	ui->NIFTIFileComboBox->setCurrentText(name);
 }
 
 void MainWindow::openSegmentFile()
@@ -362,7 +364,7 @@ void MainWindow::openSegmentFile()
 
 	for (QString qs : niiFiles) {
 		if (qs == name) {
-			int index = ui->comboBox_8->currentIndex();
+			int index = ui->NIFTIFileComboBox->currentIndex();
 			blend->ChangeActors(index, niiFilesVisbile[index], color);
 			return;
 		}
@@ -370,21 +372,21 @@ void MainWindow::openSegmentFile()
 
 	niiFiles.push_back(name);
 	niiFilesVisbile.push_back(true);
-	ui->radioButton_2->setChecked(true);
-	ui->radioButton_2->setCheckable(true);
+	ui->NIFTIRadioButton->setChecked(true);
+	ui->NIFTIRadioButton->setCheckable(true);
 
-	ui->comboBox_8->addItem(name);
-	ui->comboBox_8->setCurrentText(name);
+	ui->NIFTIFileComboBox->addItem(name);
+	ui->NIFTIFileComboBox->setCurrentText(name);
 
 	blend->DisplaySegementFile(fileName, color);
 }
 
 void MainWindow::OnChangeNiiFileVisible()
 {
-	if (ui->radioButton_2->isCheckable()) {
-		int index = ui->comboBox_8->currentIndex();
+	if (ui->NIFTIRadioButton->isCheckable()) {
+		int index = ui->NIFTIFileComboBox->currentIndex();
 		niiFilesVisbile[index] = !niiFilesVisbile[index];
-		ui->radioButton_2->setChecked(niiFilesVisbile[index]);
+		ui->NIFTIRadioButton->setChecked(niiFilesVisbile[index]);
 		blend->ChangeActors(index, niiFilesVisbile[index]);
 	}
 }
@@ -392,7 +394,7 @@ void MainWindow::OnChangeNiiFileVisible()
 void MainWindow::OnClickNiiFilesComboBox(int index)
 {
 	if (index >= 0 && index < niiFiles.size()) {
-		ui->radioButton_2->setChecked(niiFilesVisbile[index]);
+		ui->NIFTIRadioButton->setChecked(niiFilesVisbile[index]);
 	}
 }
 
@@ -425,13 +427,13 @@ void MainWindow::OnChangeSlice(int flag)
 
 void MainWindow::OnChangeWindowLevel(double wl0, double wl1)
 {
-	ui->lineEdit->setText(QString::number(wl0, 'f', 1));
-	ui->lineEdit_2->setText(QString::number(wl1, 'f', 1));
+	ui->WWEdit->setText(QString::number(wl0, 'f', 1));
+	ui->WLEdit->setText(QString::number(wl1, 'f', 1));
 }
 
 void MainWindow::SetWindowLevel()
 {
-	QString swl0 = ui->lineEdit->text(), swl1 = ui->lineEdit_2->text();
+	QString swl0 = ui->WWEdit->text(), swl1 = ui->WLEdit->text();
 	if (swl0.isEmpty() || swl0.isNull() || swl1.isEmpty() || swl1.isNull())
 		return;
 	double wl0 = swl0.toDouble(), wl1 = swl1.toDouble();
@@ -486,8 +488,8 @@ void MainWindow::OnReset()
 	}
 	else if (current2DState == 3) {
 		blend->Reset(current2DState);
-		ui->radioButton_2->setCheckable(false);
-		ui->comboBox_8->clear();
+		ui->NIFTIRadioButton->setCheckable(false);
+		ui->NIFTIFileComboBox->clear();
 	}
 }
 
