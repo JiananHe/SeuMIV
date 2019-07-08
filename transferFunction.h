@@ -20,8 +20,9 @@ public:
 
 	void setMinKey(double key);
 	void setMaxKey(double key);
-	void setminRange(int);
-	void setmaxRange(int);
+
+	bool setminRange(int);
+	bool setmaxRange(int);
 
 	T getCurBpValue();
 	int getCurBpIdx();
@@ -96,15 +97,27 @@ inline void TransferFunction<T>::setMaxKey(double key)
 }
 
 template<typename T>
-inline void TransferFunction<T>::setminRange(int m)
+inline bool TransferFunction<T>::setminRange(int m)
 {
-	min_range = m;
+	if (m >= min_key && m <= max_key)
+	{
+		min_range = m;
+		return true;
+	}
+	else
+		return false;
 }
 
 template<typename T>
-inline void TransferFunction<T>::setmaxRange(int m)
+inline bool TransferFunction<T>::setmaxRange(int m)
 {
-	max_range = m;
+	if (m >= min_key && m <= max_key)
+	{
+		max_range = m;
+		return true;
+	}
+	else
+		return false;
 }
 
 template<typename T>

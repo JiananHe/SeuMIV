@@ -20,7 +20,7 @@ public:
 	bool setMagnitudeRange(int , int);
 	int getMagnitudeRangeMin();
 	int getMagnitudeRangeMax();
-	double getPositionMag(int x, int y);
+	void getPositionMag(double*, char*);
 	void updateVisualData();
 
 	float getMaxBoundGradientValue();

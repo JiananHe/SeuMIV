@@ -158,7 +158,7 @@ void VolumeRenderProcess::addVolume()
 {
 	if (property_id != 0)
 	{
-		vtkNew<vtkImageAppendComponents> append;
+		vtkSmartPointer<vtkImageAppendComponents> append = vtkSmartPointer<vtkImageAppendComponents>::New();
 		append->SetInputData(multi_data);
 		append->AddInputData(origin_data);
 		append->Update();
@@ -227,10 +227,6 @@ void VolumeRenderProcess::showAllVolumes()
 	my_vr_widget->update();
 }
 
-void VolumeRenderProcess::clearVolumesCache()
-{
-}
-
 void VolumeRenderProcess::changeCurVolume(int cur_vid)
 {
 	//备份当前volume的property
@@ -277,8 +273,75 @@ void VolumeRenderProcess::hideCurVolume(int cur_vid)
 	volumes_status[cur_vid] = 0;
 }
 
-void VolumeRenderProcess::deleteCurVolume(int cur_vid)
+void VolumeRenderProcess::deleteCurVolume()
 {
+	int n = multi_data->GetNumberOfScalarComponents();
+	if (n <= 1)
+	{
+		clearVolumesCache();
+		return;
+	}
+
+	vtkSmartPointer<vtkImageExtractComponents> extract = vtkSmartPointer<vtkImageExtractComponents>::New();
+	vtkSmartPointer<vtkImageAppendComponents> append = vtkSmartPointer<vtkImageAppendComponents>::New();
+	vtkSmartPointer<vtkVolumeProperty> new_multi_property = vtkSmartPointer<vtkVolumeProperty>::New();
+	vtkSmartPointer<vtkColorTransferFunction> vc = vtkSmartPointer<vtkColorTransferFunction>::New();
+	vtkSmartPointer<vtkPiecewiseFunction> so = vtkSmartPointer<vtkPiecewiseFunction>::New();
+	vtkSmartPointer<vtkPiecewiseFunction> go = vtkSmartPointer<vtkPiecewiseFunction>::New();
+	int ex_vid = 0, pro_id = 0;
+
+	extract->SetInputData(multi_data);
+	new_multi_property->DeepCopy(multi_property);
+	if (cur_volume_id != 0)
+		ex_vid = 0;
+	else
+		ex_vid = 1;
+
+	extract->SetComponents(ex_vid);
+	vc->DeepCopy(multi_property->GetRGBTransferFunction(ex_vid));
+	new_multi_property->SetColor(pro_id, vc);
+	so->DeepCopy(multi_property->GetScalarOpacity(ex_vid));
+	new_multi_property->SetScalarOpacity(pro_id, so);
+	go->DeepCopy(multi_property->GetGradientOpacity(ex_vid));
+	new_multi_property->SetGradientOpacity(pro_id, go);
+	ex_vid++;
+	pro_id++;
+
+	append->SetInputConnection(extract->GetOutputPort());
+	append->Update();
+
+	while(ex_vid < n)
+	{
+		if (cur_volume_id != ex_vid)
+		{
+			extract->SetComponents(ex_vid);
+			append->AddInputConnection(extract->GetOutputPort());
+			vc->DeepCopy(multi_property->GetRGBTransferFunction(ex_vid));
+			new_multi_property->SetColor(pro_id, vc);
+			so->DeepCopy(multi_property->GetScalarOpacity(ex_vid));
+			new_multi_property->SetScalarOpacity(pro_id, so);
+			go->DeepCopy(multi_property->GetGradientOpacity(ex_vid));
+			new_multi_property->SetGradientOpacity(pro_id, go);
+		}
+		ex_vid++;
+		pro_id++;
+	}
+	append->Update();
+	multi_data->DeepCopy(append->GetOutput());
+	multi_property->DeepCopy(new_multi_property);
+	update();
+}
+
+void VolumeRenderProcess::clearVolumesCache()
+{
+	multi_data->RemoveAllObservers();
+	multi_property->RemoveAllObservers();
+	multi_data = vtkSmartPointer<vtkImageData>::New();
+	multi_property = vtkSmartPointer<vtkVolumeProperty>::New();
+	volume_render->RemoveAllObservers();
+	volume_render->RemoveAllViewProps();
+
+	update();
 }
 
 void VolumeRenderProcess::setBgColor(QColor color)

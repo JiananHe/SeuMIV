@@ -40,38 +40,20 @@ int BoundVisualizer::getMagnitudeRangeMax()
 	return mag_max_threshold;
 }
 
-double BoundVisualizer::getPositionMag(int x, int y)
+void BoundVisualizer::getPositionMag(double* pickCoords, char* gd_str)
 {
 	vtkSmartPointer<vtkImageData> gradient = imgMagnitude->GetOutput();
 	vtkSmartPointer<vtkPointData> pointData_gd = vtkSmartPointer<vtkPointData>::New();
 
-	vtkSmartPointer<vtkWorldPointPicker> picker = vtkSmartPointer<vtkWorldPointPicker>::New();
-
-	double pickCoords[3];
-	picker->Pick(x, y, 0, viewer->GetRenderer());
-	picker->GetPickPosition(pickCoords);
-
-	// Fixes some numerical problems with the picking
-	double *bounds = viewer->GetImageActor()->GetDisplayBounds();
-	int axis = viewer->GetSliceOrientation();
-	pickCoords[axis] = bounds[2 * axis];
-
 	vtkPointData* pd_gd = gradient->GetPointData();
 	if (!pd_gd)
-	{
-		return -10000.0;
-	}
+		sprintf(gd_str, "%s", "None");
 
 	pointData_gd->InterpolateAllocate(pd_gd, 1, 1);
 
 	// Use tolerance as a function of size of source data
 	double tol2 = gradient->GetLength();
 	tol2 = tol2 ? tol2 * tol2 / 1000.0 : 0.001;
-
-	// Find the cell that contains pos
-	int subId_gv;
-	double pcoords_gv[3], weights_gv[8];
-	vtkCell* cell_gv = gradient->FindAndGetCell(pickCoords, NULL, -1, tol2, subId_gv, pcoords_gv, weights_gv);
 
 	// Find the cell that contains pos
 	int subId_gd;
@@ -82,10 +64,10 @@ double BoundVisualizer::getPositionMag(int x, int y)
 		// Interpolate the point data
 		pointData_gd->InterpolatePoint(pd_gd, 0, cell_gd->PointIds, weights_gd);
 		double* tuple = pointData_gd->GetScalars()->GetTuple(0);
-		return tuple[0];
+		sprintf(gd_str, "%.2f", tuple[0]);
 	}
 	else
-		return -10000.0;
+		sprintf(gd_str, "%s", "None");
 }
 
 float BoundVisualizer::getMaxBoundGradientValue()

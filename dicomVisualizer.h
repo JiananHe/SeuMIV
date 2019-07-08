@@ -9,10 +9,10 @@ public:
 	~DicomVisualizer();
 
 	void transferData();
-	double showPositionGray(int x, int y);
-	void showPositionMag(QString);
+	void getPositionGray(int, int, char*, double*);
 
-	vtkSmartPointer<vtkImageData> getOriginGrayData();
-	vtkSmartPointer<vtkImageData> getOriginMagnitudeData();
+	void showPositionInfo(double* pickCoords, char * gv, char * gd);
+
+private:
+	vtkSmartPointer<vtkTextActor> textActor;
 };
-

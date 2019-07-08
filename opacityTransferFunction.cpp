@@ -24,7 +24,7 @@ OpacityTransferFunctioin::~OpacityTransferFunctioin()
 void OpacityTransferFunctioin::setInitialOpacityTf(vtkPiecewiseFunction * volumeOpacity)
 {
 	tf_bps->removeAllPoints();
-	tf_bps->insertBreakPoint(min_key, 1.0);
+	tf_bps->insertBreakPoint(min_key, 0.0);
 	tf_bps->insertBreakPoint(max_key, 1.0);
 
 	updateVolumeOpacity(volumeOpacity);
@@ -134,7 +134,7 @@ void OpacityTransferFunctioin::setCustomizedOpacityTf(vtkPiecewiseFunction * vol
 	map<double, double>::iterator iter;
 	for (iter = my_tf_bps.begin(); iter != my_tf_bps.end(); ++iter)
 	{
-		this->tf_bps->insertBreakPoint(iter->first, iter->second);
+		this->tf_bps->insertBreakPoint(int(iter->first + 0.5), iter->second);
 	}
 	updateVolumeOpacity(volumeOpacity);
 
@@ -153,6 +153,13 @@ void OpacityTransferFunctioin::updateVisualOpacity(vtkPiecewiseFunction * volume
 		volumeOpacity->GetNodeValue(i, node);
 		tf_bps->insertBreakPoint(node[0], node[1]);
 	}
+
+	volumeOpacity->GetNodeValue(0, node);
+	setMinKey(int(node[0]));
+	volumeOpacity->GetNodeValue(bp_num - 1, node);
+	setMaxKey(int(node[0]));
+	printf("min key: %d, max key: %d", min_key, max_key);
+
 	//show info of the first color bp 
 	cur_bp_idx = 0;
 	showTfBpInfoAt(0);

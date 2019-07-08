@@ -150,6 +150,13 @@ void ColorTransferFunction::updateVisualColor(vtkColorTransferFunction * volumeC
 		volumeColor->GetNodeValue(i, node);
 		tf_bps->insertBreakPoint(node[0], MyQColor(QColor(int(node[1] * 255 + 0.5), int(node[2] * 255 + 0.5), int(node[3] * 255 + 0.5))));
 	}
+
+	volumeColor->GetNodeValue(0, node);
+	setMinKey(int(node[0]));
+	volumeColor->GetNodeValue(bp_num - 1, node);
+	setMaxKey(int(node[0]));
+	printf("min key: %d, max key: %d", min_key, max_key);
+
 	//show info of the first color bp 
 	cur_bp_idx = 0;
 	showTfBpInfoAt(0);
@@ -171,6 +178,11 @@ void ColorTransferFunction::showTfDiagram()
 	//绘制颜色传递函数的颜色条，需要插值计算min_range与max_range处的颜色
 	map<double, MyQColor> colortf_bps = tf_bps->getBreakPointsMap();
 	map<double, MyQColor>::iterator iter;
+	double min_bp_key = colortf_bps.begin()->first;
+	double max_bp_key = colortf_bps.rbegin()->first;
+	if (min_range < min_bp_key || max_range > max_bp_key)
+		return;
+
 	QLinearGradient linearGradient(d, h / 2, w - d, h / 2);
 	
 	int n = colortf_bps.size(), t = 0;

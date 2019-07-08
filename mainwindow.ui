@@ -104,35 +104,6 @@ font: 75 10pt &quot;微软雅黑&quot;;</string>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="button2D">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-           <horstretch>2</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="font">
-          <font>
-           <family>微软雅黑</family>
-           <pointsize>10</pointsize>
-           <weight>9</weight>
-           <italic>false</italic>
-           <bold>false</bold>
-          </font>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">color: rgb(255, 255, 255);
-font: 75 10pt &quot;微软雅黑&quot;;</string>
-         </property>
-         <property name="text">
-          <string>二维浏览</string>
-         </property>
-         <property name="flat">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QPushButton" name="button3D">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1012,7 +983,7 @@ color: rgb(0, 0, 56)</string>
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
-               <verstretch>6</verstretch>
+               <verstretch>3</verstretch>
               </sizepolicy>
              </property>
              <property name="styleSheet">
@@ -1040,29 +1011,16 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:1.5, x2:0.5, y2:-0.7, s
               <property name="bottomMargin">
                <number>8</number>
               </property>
-              <item row="1" column="0">
-               <widget class="QPushButton" name="tool_rotation_button">
+              <item row="1" column="2" colspan="2">
+               <widget class="QPushButton" name="tool_roiGrad_button">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
-                  <height>38</height>
+                  <height>45</height>
                  </size>
                 </property>
                 <property name="text">
-                 <string>Rotation</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QPushButton" name="tool_front_button">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>38</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Front</string>
+                 <string>ROI-梯度</string>
                 </property>
                </widget>
               </item>
@@ -1077,7 +1035,7 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:1.5, x2:0.5, y2:-0.7, s
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
-                  <height>38</height>
+                  <height>45</height>
                  </size>
                 </property>
                 <property name="styleSheet">
@@ -1098,68 +1056,29 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:1.5, x2:0.5, y2:-0.7, s
                 </property>
                </widget>
               </item>
-              <item row="1" column="2">
-               <widget class="QPushButton" name="tool_flank_tool">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>38</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Flank</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="3">
-               <widget class="QPushButton" name="tool_top_button">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>38</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Top</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="2" colspan="2">
-               <widget class="QPushButton" name="tool_roiGrad_button">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>38</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>ROI-梯度</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0" colspan="2">
-               <widget class="QPushButton" name="tool_roiScalar_button">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>38</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>ROI-标量</string>
-                </property>
-               </widget>
-              </item>
               <item row="0" column="0" colspan="2">
                <widget class="QPushButton" name="tool_style_button">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
-                  <height>38</height>
+                  <height>45</height>
                  </size>
                 </property>
                 <property name="text">
                  <string>Style: Initial</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" colspan="2">
+               <widget class="QPushButton" name="tool_roiScalar_button">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>45</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>ROI-标量</string>
                 </property>
                </widget>
               </item>
@@ -1605,6 +1524,9 @@ color: rgb(0, 0, 56)</string>
                     </item>
                     <item>
                      <widget class="QToolButton" name="colortf_right_button">
+                      <property name="focusPolicy">
+                       <enum>Qt::NoFocus</enum>
+                      </property>
                       <property name="text">
                        <string/>
                       </property>
@@ -1838,6 +1760,9 @@ color: rgb(0, 0, 56)</string>
                     </item>
                     <item>
                      <widget class="QToolButton" name="scalartf_right_button">
+                      <property name="focusPolicy">
+                       <enum>Qt::NoFocus</enum>
+                      </property>
                       <property name="text">
                        <string/>
                       </property>
@@ -2071,6 +1996,9 @@ color: rgb(0, 0, 56)</string>
                     </item>
                     <item>
                      <widget class="QToolButton" name="gradienttf_right_button">
+                      <property name="focusPolicy">
+                       <enum>Qt::NoFocus</enum>
+                      </property>
                       <property name="text">
                        <string/>
                       </property>

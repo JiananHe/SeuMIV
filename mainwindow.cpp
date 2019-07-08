@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 	this->setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
-	ui->stackedWidget->setCurrentIndex(0);
+	ui->stackedWidget->setCurrentIndex(1);
 
 	//体绘制及传递函数相关对象
 	vrProcess = new VolumeRenderProcess(ui->volumeRenderWidget);
@@ -25,8 +25,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	boundVisualizer = new BoundVisualizer(ui->bound_frame, "bound", ui->series_slider_frame);
 
 	//页面切换响应
-	connect(ui->button2D, SIGNAL(released()), this, SLOT(onView2DSlot()));
-	connect(ui->button3D, SIGNAL(released()), this, SLOT(onView3DSlot()));
+	//connect(ui->button2D, SIGNAL(released()), this, SLOT(onView2DSlot()));
+	//connect(ui->button3D, SIGNAL(released()), this, SLOT(onView3DSlot()));
 
 	//程序最小化以及退出
 	connect(ui->exit, SIGNAL(released()), qApp, SLOT(quit()));
@@ -61,15 +61,15 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->scalartf_curbp_opacity_label->installEventFilter(this);
 	connect(ui->scalartf_left_button, SIGNAL(released()), this, SLOT(changeCurTfBpInfo()));
 	connect(ui->scalartf_right_button, SIGNAL(released()), this, SLOT(changeCurTfBpInfo()));
-	connect(ui->scalartf_x_slider, SIGNAL(lowerValueChanged(int)), this, SLOT(onScalarTfMinRangeChange(int)));
-	connect(ui->scalartf_x_slider, SIGNAL(upperValueChanged(int)), this, SLOT(onScalarTfMaxRangeChange(int)));
+	/*connect(ui->scalartf_x_slider, SIGNAL(lowerValueChanged(int)), this, SLOT(onScalarTfMinRangeChange(int)));
+	connect(ui->scalartf_x_slider, SIGNAL(upperValueChanged(int)), this, SLOT(onScalarTfMaxRangeChange(int)));*/
 	
 	ui->gradientOpacityTfBar->installEventFilter(this);
 	ui->gradienttf_curbp_opacity_label->installEventFilter(this);
 	connect(ui->gradienttf_left_button, SIGNAL(released()), this, SLOT(changeCurTfBpInfo()));
 	connect(ui->gradienttf_right_button, SIGNAL(released()), this, SLOT(changeCurTfBpInfo()));
-	connect(ui->gradienttf_x_slider, SIGNAL(lowerValueChanged(int)), this, SLOT(onGradientTfMinRangeChange(int)));
-	connect(ui->gradienttf_x_slider, SIGNAL(upperValueChanged(int)), this, SLOT(onGradientTfMaxRangeChange(int)));
+	/*connect(ui->gradienttf_x_slider, SIGNAL(lowerValueChanged(int)), this, SLOT(onGradientTfMinRangeChange(int)));
+	connect(ui->gradienttf_x_slider, SIGNAL(upperValueChanged(int)), this, SLOT(onGradientTfMaxRangeChange(int)));*/
 
 	//增量绘制相关响应事件
 	cur_volume_id = -1;
@@ -124,7 +124,7 @@ MainWindow::~MainWindow()
 void MainWindow::onView2DSlot()
 {
 	ui->stackedWidget->setCurrentIndex(0);
-	ui->button2D->setStyleSheet(TOP_BUTTON_SELECTED_STYLE);
+	//ui->button2D->setStyleSheet(TOP_BUTTON_SELECTED_STYLE);
 	ui->button3D->setStyleSheet(TOP_BUTTON_UNSELECTED_STYLE);
 }
 
@@ -133,7 +133,7 @@ void MainWindow::onView3DSlot()
 {
 	ui->stackedWidget->setCurrentIndex(1);
 	ui->button3D->setStyleSheet(TOP_BUTTON_SELECTED_STYLE);
-	ui->button2D->setStyleSheet(TOP_BUTTON_UNSELECTED_STYLE);
+	//ui->button2D->setStyleSheet(TOP_BUTTON_UNSELECTED_STYLE);
 }
 
 void MainWindow::onOpenDicomSlot()
@@ -157,9 +157,6 @@ void MainWindow::onOpenDicomSlot()
 	colorTf->setMinKey(min_gv);
 	opacityTf->setMaxKey(max_gv);
 	opacityTf->setMinKey(min_gv);
-
-	gradientTf->setMaxKey(1185);
-	gradientTf->setMinKey(0);
 
 	//设置初始传递函数
 	ui->colorTfWidget->setVisible(true);
@@ -185,9 +182,12 @@ void MainWindow::onOpenDicomSlot()
 	double max_gradient = boundVisualizer->getMaxBoundGradientValue();
 	double min_gradient = boundVisualizer->getMinBoundGradientValue();
 
-	gradientTf->setMaxKey(int(max_gradient));
-	gradientTf->setMinKey(int(min_gradient));
-	gradientTf->setInitialOpacityTf(vrProcess->getVolumeGradientTf());
+	gradientTf->setMaxKey(max_gradient);
+	gradientTf->setMinKey(min_gradient);
+	map<double, double> initial_gd_tf;
+	initial_gd_tf.insert(pair<double, double>(min_gradient, 1.0));
+	initial_gd_tf.insert(pair<double, double>(max_gradient, 1.0));
+	gradientTf->setCustomizedOpacityTf(vrProcess->getVolumeGradientTf(), initial_gd_tf);
 
 	vrProcess->update();
 	multi_render_flag = false;
@@ -240,9 +240,12 @@ void MainWindow::onOpenNifitSlot()
 	double max_gradient = boundVisualizer->getMaxBoundGradientValue();
 	double min_gradient = boundVisualizer->getMinBoundGradientValue();
 
-	gradientTf->setMaxKey(int(max_gradient));
-	gradientTf->setMinKey(int(min_gradient));
-	gradientTf->setInitialOpacityTf(vrProcess->getVolumeGradientTf());
+	gradientTf->setMaxKey(max_gradient);
+	gradientTf->setMinKey(min_gradient);
+	map<double, double> initial_gd_tf;
+	initial_gd_tf.insert(pair<double, double>(min_gradient, 1.0));
+	initial_gd_tf.insert(pair<double, double>(max_gradient, 1.0));
+	gradientTf->setCustomizedOpacityTf(vrProcess->getVolumeGradientTf(), initial_gd_tf);
 
 	vrProcess->update();
 	multi_render_flag = false;
@@ -514,18 +517,20 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
 	//dicom序列图
 	if (watched == ui->dicom_widget)
 	{
-		if (event->type() == QEvent::MouseButtonRelease)
+		if (event->type() == QEvent::MouseButtonPress)
 		{
 			QPoint mp = ui->dicom_widget->mapFromGlobal(QCursor::pos());
-			double gray = dicomVisualizer->showPositionGray(mp.x(), ui->dicom_widget->geometry().height() - mp.y() - 1);
-			double mag = boundVisualizer->getPositionMag(mp.x(), ui->dicom_widget->geometry().height() - mp.y() - 1);
-			//roiVisualizer->setKMeansInitPoint(gray, mag);
-			if (mag == -10000.0)
-				dicomVisualizer->showPositionMag("None");
-			else
-				dicomVisualizer->showPositionMag(QString::number(mag, 10, 2));
+			int x = mp.x(), y = ui->dicom_widget->geometry().height() - mp.y() - 1;
+			char gv_str[10], gd_str[10];
+			double pickCoords[3];
+			dicomVisualizer->getPositionGray(x, y, gv_str, pickCoords);
+			boundVisualizer->getPositionMag(pickCoords, gd_str);
+
+			dicomVisualizer->showPositionInfo(pickCoords, gv_str, gd_str);
 		}
 	}
+
+	return QMainWindow::eventFilter(watched, event);
 }
 
 //改变传递函数当前断点信息
@@ -552,43 +557,43 @@ void MainWindow::changeCurTfBpInfo()
 void MainWindow::onColorTfMinRangeChange(int lower)
 {
 	ui->colortf_x_min->setText(QString::number(lower));
-	colorTf->setminRange(lower);
-	ui->colorTfBar->repaint();
+	if(colorTf->setminRange(lower))
+		ui->colorTfBar->repaint();
 }
 
 void MainWindow::onColorTfMaxRangeChange(int upper)
 {
 	ui->colortf_x_max->setText(QString::number(upper));
-	colorTf->setmaxRange(upper);
-	ui->colorTfBar->repaint();
+	if(colorTf->setmaxRange(upper))
+		ui->colorTfBar->repaint();
 }
 
 void MainWindow::onScalarTfMinRangeChange(int lower)
 {
 	ui->scalartf_x_min->setText(QString::number(lower));
-	opacityTf->setminRange(lower);
-	ui->scalarOpacityTfBar->repaint();
+	if(opacityTf->setminRange(lower))
+		ui->scalarOpacityTfBar->repaint();
 }
 
 void MainWindow::onScalarTfMaxRangeChange(int upper)
 {
 	ui->scalartf_x_max->setText(QString::number(upper));
-	opacityTf->setmaxRange(upper);
-	ui->scalarOpacityTfBar->repaint();
+	if(opacityTf->setmaxRange(upper))
+		ui->scalarOpacityTfBar->repaint();
 }
 
 void MainWindow::onGradientTfMinRangeChange(int lower)
 {
 	ui->gradienttf_x_min->setText(QString::number(lower));
-	gradientTf->setminRange(lower);
-	ui->gradientOpacityTfBar->repaint();
+	if(gradientTf->setminRange(lower))
+		ui->gradientOpacityTfBar->repaint();
 }
 
 void MainWindow::onGradientTfMaxRangeChange(int upper)
 {
 	ui->gradienttf_x_max->setText(QString::number(upper));
-	gradientTf->setmaxRange(upper);
-	ui->gradientOpacityTfBar->repaint();
+	if(gradientTf->setmaxRange(upper))
+		ui->gradientOpacityTfBar->repaint();
 }
 
 //叠加体绘制图
@@ -606,7 +611,6 @@ void MainWindow::onAddVolumeSlot()
 		QMessageBox::warning(NULL, "warning", QStringLiteral("内存不足，无法添加"));
 	else
 	{
-		ui->ir_clear_button->setEnabled(true);
 		ui->ir_rename_button->setEnabled(true);
 		ui->ir_delete_button->setEnabled(true);
 		ui->ir_radioButton->setChecked(true);
@@ -656,6 +660,7 @@ void MainWindow::onShowAllVolumesSlot()
 	ui->ir_radioButton->setEnabled(true);
 	ui->ir_radioButton->setChecked(true);
 	ui->ir_comboBox->setEnabled(true);
+	ui->ir_clear_button->setEnabled(true);
 	ui->ir_add_button->setEnabled(false);
 	for (int i = 0; i < volume_flags.size(); ++i)
 		volume_flags[i] = true;
@@ -676,6 +681,9 @@ void MainWindow::onClearAllVolumesSlot()
 	ui->ir_radioButton->setEnabled(false);
 	ui->ir_rename_button->setEnabled(false);
 	ui->ir_delete_button->setEnabled(false);
+	ui->ir_add_button->setEnabled(true);
+
+	vrProcess->clearVolumesCache();
 }
 
 void MainWindow::onDeleteVolumeSlot()
@@ -689,6 +697,8 @@ void MainWindow::onDeleteVolumeSlot()
 	volume_names.removeAt(cur_volume_id);
 	cur_volume_id = cur_volume_id == volume_flags.size() ? cur_volume_id - 1 : cur_volume_id;
 	int cur_temp = cur_volume_id;
+
+	vrProcess->deleteCurVolume();
 
 	if (volume_flags.size())//还有Volume
 	{
@@ -708,7 +718,9 @@ void MainWindow::onDeleteVolumeSlot()
 		ui->ir_radioButton->setEnabled(false);
 		ui->ir_rename_button->setEnabled(false);
 		ui->ir_delete_button->setEnabled(false);
+		ui->ir_add_button->setEnabled(true);
 	}
+
 }
 
 void MainWindow::onCurVolumeChangedSlot(int name_id)

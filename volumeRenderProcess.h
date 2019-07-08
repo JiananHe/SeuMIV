@@ -22,6 +22,7 @@
 #include <vtkOutlineFilter.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkImageAppendComponents.h>
+#include <vtkImageExtractComponents.h>
 #include <queue>
 
 #include <qcolor.h>
@@ -42,7 +43,7 @@ public:
 	void changeCurVolume(int);
 	void showCurVolume(int);
 	void hideCurVolume(int);
-	void deleteCurVolume(int);
+	void deleteCurVolume();
 
 	void setBgColor(QColor );
 
